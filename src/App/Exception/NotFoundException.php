@@ -2,5 +2,5 @@
 
 namespace Xhtkyy\HyperfTools\App\Exception;
 
-class ValidationException extends AppException {
+class NotFoundException extends AppException {
 }

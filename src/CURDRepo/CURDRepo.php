@@ -6,8 +6,8 @@ namespace Xhtkyy\HyperfTools\CURDRepo;
 use Hyperf\Database\Model\Builder;
 use Psr\Http\Message\RequestInterface;
 use Xhtkyy\HyperfTools\App\Exception\AppException;
-use Xhtkyy\HyperfTools\App\Exception\NoFoundException;
-use Xhtkyy\HyperfTools\App\Exception\ValidationException;
+use Xhtkyy\HyperfTools\App\Exception\NotFoundException;
+use Xhtkyy\HyperfTools\App\Exception\InvalidArgumentException;
 
 abstract class CURDRepo {
     protected string $model;
@@ -97,11 +97,11 @@ abstract class CURDRepo {
      */
     public function modify(array $params, array $where = []): bool|int {
         $where = array_merge($this->where, $where);
-        if (empty($where)) throw new ValidationException("修改条件不能为空");
+        if (empty($where)) throw new InvalidArgumentException("修改条件不能为空");
         $info = $this->query()
             ->where($where)
             ->first();
-        if (!$info) throw new NoFoundException("查询失败,稍后重试");
+        if (!$info) throw new NotFoundException("查询失败,稍后重试");
         //过滤掉id
         if (isset($params["id"])) unset($params["id"]);
         return tap($info->update($params) ?? 0,
@@ -116,12 +116,12 @@ abstract class CURDRepo {
      * @param $id
      * @param array $where
      * @return int
-     * @throws ValidationException
+     * @throws InvalidArgumentException
      */
     public function delete($id = null, array $where = []): int {
         if ($id) $where["id"] = $id;
         $where = array_merge($this->where, $where);
-        if (empty($where)) throw new ValidationException("删除条件不能为空");
+        if (empty($where)) throw new InvalidArgumentException("删除条件不能为空");
         return $this->query()
             ->where($where)
             ->delete();
@@ -132,12 +132,12 @@ abstract class CURDRepo {
      * @param $id
      * @param array $where
      * @return object|null
-     * @throws ValidationException
+     * @throws InvalidArgumentException
      */
     public function detail($id = null, array $where = []): object|null {
         if ($id) $where["id"] = $id;
         $where = array_merge($this->where, $where);
-        if (empty($where)) throw new ValidationException("条件不能为空");
+        if (empty($where)) throw new InvalidArgumentException("条件不能为空");
         $query = $this->query();
         if (!empty($this->with)) {
             $query->with($this->with);

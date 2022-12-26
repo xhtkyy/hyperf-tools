@@ -26,7 +26,8 @@ php bin/hyperf.php vendor:publish xhtkyy/hyperf-tools
  - 通过助手函数
    di(class)
 ### 异常
-    Xhtkyy\HyperfTools\App\Exception\AppException::class
+    异常是需要规范的，这里举例了 NotFoundException（找不到资源）、InvalidArgumentException(无效参数异常)
+    其他自定义异常 继承 Xhtkyy\HyperfTools\App\Exception\AppException::class 即可轻松捕抓
 ### CURD
     将基础的CURD封装 继承 Xhtkyy\HyperfTools\CURDRepo\CURDRepo 即可，如
 ```php
