@@ -37,6 +37,8 @@ php bin/hyperf.php vendor:publish xhtkyy/hyperf-tools
     }
     //开始使用
     class MessageController {
+        #[Inject]
+        protected MessageRepo $messageRepo;
         /**
          * 获取列表
          * @return array
