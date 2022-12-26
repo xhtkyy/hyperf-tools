@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace Xhtkyy\HyperfTools;
 
 use DtmClient\Api\GrpcApi;
+use Xhtkyy\HyperfTools\App\Container;
+use Xhtkyy\HyperfTools\App\ContainerInterface;
 use Xhtkyy\HyperfTools\Consul\Listener\RegisterConsul4GrpcDriverListener;
 use Xhtkyy\HyperfTools\Consul\Listener\RegisterGrpcServiceListener;
 use Xhtkyy\HyperfTools\Dtm\DtmGrpcApi;
@@ -23,8 +25,10 @@ class ConfigProvider {
     public function __invoke(): array {
         return [
             'dependencies' => [
-                GrpcClientManager::class => GrpcClientManagerFactory::class,
-                GrpcApi::class           => DtmGrpcApi::class,
+                GrpcClientManager::class  => GrpcClientManagerFactory::class,
+                GrpcApi::class            => DtmGrpcApi::class,
+                //接管容器
+                ContainerInterface::class => Container::class,
             ],
             'commands'     => [
             ],

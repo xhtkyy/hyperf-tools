@@ -5,7 +5,7 @@ namespace Xhtkyy\HyperfTools\GrpcClient;
 
 use Google\Protobuf\Internal\Message;
 use Hyperf\Di\Annotation\Inject;
-use Psr\Container\ContainerInterface;
+use Xhtkyy\HyperfTools\App\ContainerInterface;
 
 class BaseGrpcClient {
 

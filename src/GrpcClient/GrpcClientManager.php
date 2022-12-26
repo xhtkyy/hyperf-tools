@@ -5,26 +5,24 @@ namespace Xhtkyy\HyperfTools\GrpcClient;
 use Exception;
 use Google\Protobuf\Internal\Message;
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\Di\Annotation\Inject;
 use Hyperf\Grpc\StatusCode;
 use Hyperf\LoadBalancer\LoadBalancerManager;
 use Hyperf\LoadBalancer\Node;
 use Hyperf\ServiceGovernance\DriverManager;
-use Psr\Container\ContainerInterface;
+use Xhtkyy\HyperfTools\App\ContainerInterface;
 
 class GrpcClientManager {
     private string $governanceDriverPath;
     private string|null $credentials = null;
     private array $pools = [];
 
-
-    #[Inject]
     protected DriverManager $governanceManager;
-    #[Inject]
-    protected ContainerInterface $container;
+    protected ConfigInterface $config;
 
-    public function __construct(ConfigInterface $config) {
-        $this->governanceDriverPath = $config->get("kyy_tools.consul.hostname", "consul:8500");
+    public function __construct(protected ContainerInterface $container) {
+        $this->config               = $this->container->get(ConfigInterface::class);
+        $this->governanceManager    = $this->container->get(DriverManager::class);
+        $this->governanceDriverPath = $this->config->get("kyy_tools.consul.hostname", "consul:8500");
     }
 
     public function getNode(string $server): string {

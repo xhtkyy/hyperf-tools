@@ -11,7 +11,7 @@ use Hyperf\Framework\Event\MainWorkerStart;
 use Hyperf\ServiceGovernance\DriverManager;
 use Hyperf\ServiceGovernance\ServiceManager;
 use Hyperf\ServiceGovernanceConsul\ConsulAgent;
-use Psr\Container\ContainerInterface;
+use Xhtkyy\HyperfTools\App\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 class RegisterGrpcServiceListener implements ListenerInterface {

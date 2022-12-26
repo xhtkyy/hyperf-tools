@@ -10,7 +10,10 @@
     "autoload": {
         "psr-4": {
             "Xhtkyy\\HyperfTools\\": "src/"
-        }
+        },
+        "files": [
+            "src/Function.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -20,6 +23,7 @@
     "require": {
         "php": ">=8.0",
         "dtm/dtm-client": "^0.3.2",
+        "hyperf/db-connection": "^3.0.0",
         "hyperf/di": "3.0.*",
         "hyperf/event": "^3.0.0",
         "hyperf/framework": "3.0.*",

@@ -3,13 +3,13 @@
 namespace Xhtkyy\HyperfTools\Dtm;
 
 use Hyperf\Contract\ConfigInterface;
-use Psr\Container\ContainerInterface;
+use Xhtkyy\HyperfTools\App\ContainerInterface;
 use Xhtkyy\HyperfTools\GrpcClient\GrpcClientManager;
 
 class GrpcClientManagerFactory {
     public function __invoke(ContainerInterface $container): GrpcClientManager {
         $config  = $container->get(ConfigInterface::class);
-        $manager = new GrpcClientManager($config);
+        $manager = new GrpcClientManager($container);
         //判断是否 需要dtm
         if ($config->has('dtm')) {
             $server   = $config->get('dtm.server', '127.0.0.1');

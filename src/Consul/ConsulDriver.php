@@ -11,7 +11,7 @@ use Hyperf\Guzzle\ClientFactory;
 use Hyperf\ServiceGovernance\DriverInterface;
 use Hyperf\ServiceGovernance\Exception\ComponentRequiredException;
 use Hyperf\ServiceGovernanceConsul\ConsulAgent;
-use Psr\Container\ContainerInterface;
+use Xhtkyy\HyperfTools\App\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
 class ConsulDriver implements DriverInterface {
