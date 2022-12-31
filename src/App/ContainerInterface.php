@@ -2,7 +2,7 @@
 
 namespace Xhtkyy\HyperfTools\App;
 
-interface ContainerInterface {
+interface ContainerInterface  {
     public function get(string $id);
 
     public function has(string $id): bool;
