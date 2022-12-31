@@ -5,6 +5,7 @@ namespace Xhtkyy\HyperfTools\GrpcClient;
 use Exception;
 use Google\Protobuf\Internal\Message;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Grpc\StatusCode;
 use Hyperf\LoadBalancer\LoadBalancerManager;
 use Hyperf\LoadBalancer\Node;
@@ -23,7 +24,7 @@ class GrpcClientManager {
     public function __construct(protected ContainerInterface $container) {
         $this->config            = $this->container->get(ConfigInterface::class);
         $this->governanceManager = $this->container->get(DriverManager::class);
-        $this->logger            = $this->container->get(LoggerInterface::class);
+        $this->logger            = $this->container->get(StdoutLoggerInterface::class);
     }
 
     public function getNode(string $server): string {
