@@ -28,10 +28,10 @@ class GrpcClientManager {
     }
 
     public function getNode(string $server): string {
-        $serverName       = $this->config->get("kyy_tools.register.server_name", "nacos");
-        $consulDriverPath = $serverName == "nacos" ? "" : $this->config->get("services.drivers.consul.uri", "consul:8500");
+        $driverName       = $this->config->get("kyy_tools.register.driver_name", "nacos");
+        $consulDriverPath = $driverName == "nacos" ? "" : $this->config->get("services.drivers.consul.uri", "consul:8500");
         $algo             = $this->config->get("kyy_tools.register.algo", "round-robin");
-        if ($governance = $this->governanceManager->get($serverName)) {
+        if ($governance = $this->governanceManager->get($driverName)) {
             try {
                 /**
                  * @var LoadBalancerManager $loadBalancerManager
@@ -52,7 +52,7 @@ class GrpcClientManager {
                 $node = $serverLB->select();
                 return sprintf("%s:%d", $node->host, $node->port);
             } catch (\Throwable $throwable) {
-                $this->logger->error(sprintf("服务(%s)获取失败 策略：%s 原因：%s", $serverName, $algo, $throwable->getMessage()));
+                $this->logger->error(sprintf("服务 %s 在 %s 获取失败 策略：%s 原因：%s", $server, $driverName, $algo, $throwable->getMessage()));
             }
         }
         return "";
