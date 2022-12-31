@@ -73,7 +73,13 @@ php bin/hyperf.php vendor:publish xhtkyy/hyperf-tools
 
 ### 服务注册/发现
 
-#### 服务注册
+#### 1、发布配置
+```
+php bin/hyperf.php vendor:publish hyperf/service-governance
+php bin/hyperf.php vendor:publish xhtkyy/hyperf-tools
+```
+
+#### 2、服务注册
 
 自动发现配置中server_name配置的服务名称，在路由中对应服务名称，如以下 "grpc"
 
@@ -90,6 +96,6 @@ Router::addServer('grpc', function () {
 });
 ```
 
-#### 服务发现
+#### 3、服务发现
 
 使用继承 \Xhtkyy\HyperfTools\GrpcClient\BaseGrpcClient 即可完成服务自动发现 可在配置中配置发现算法 默认轮询
