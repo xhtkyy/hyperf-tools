@@ -8,11 +8,12 @@ use Hyperf\Contract\IPReaderInterface;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Framework\Event\MainWorkerStart;
+use Hyperf\HttpServer\Router\DispatcherFactory;
+use Hyperf\HttpServer\Router\Handler;
 use Hyperf\ServiceGovernance\DriverManager;
 use Hyperf\ServiceGovernance\ServiceManager;
-use Hyperf\ServiceGovernanceConsul\ConsulAgent;
-use Xhtkyy\HyperfTools\App\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Xhtkyy\HyperfTools\App\ContainerInterface;
 
 class RegisterGrpcServiceListener implements ListenerInterface {
     protected LoggerInterface $logger;
@@ -25,7 +26,7 @@ class RegisterGrpcServiceListener implements ListenerInterface {
 
     protected DriverManager $governanceManager;
 
-    protected ConsulAgent $consulAgent;
+    protected DispatcherFactory $dispatcherFactory;
 
     public function __construct(ContainerInterface $container) {
         try {
@@ -34,7 +35,7 @@ class RegisterGrpcServiceListener implements ListenerInterface {
             $this->config            = $container->get(ConfigInterface::class);
             $this->ipReader          = $container->get(IPReaderInterface::class);
             $this->governanceManager = $container->get(DriverManager::class);
-            $this->consulAgent       = $container->get(ConsulAgent::class);
+            $this->dispatcherFactory = $container->get(DispatcherFactory::class);
         } catch (\Throwable $exception) {
         }
     }
@@ -46,9 +47,25 @@ class RegisterGrpcServiceListener implements ListenerInterface {
     }
 
     public function process(object $event): void {
-        $continue = true;
-        $protocol = 'grpc';
-        $services = $this->config->get("kyy_tools.consul.register_grpc_services");
+        $continue   = true;
+        $protocol   = 'grpc';
+        $serverName = $this->config->get("kyy_tools.register.server_name", "grpc");
+        $driverName = $this->config->get("kyy_tools.register.driver_name", "nacos");
+        $services   = [];
+        /**
+         * @var Handler $handler
+         */
+        foreach ($this->dispatcherFactory
+                     ->getRouter($serverName)
+                     ->getData()[0]['POST'] as $handler) {
+            if (isset($handler->options['register']) && !$handler->options['register']) {
+                continue;
+            }
+            $service = trim(current(explode(".", $handler->route)), "/");
+            if (!in_array($service, $services)) {
+                $services[] = $service;
+            }
+        }
         if (empty($services)) {
             $this->logger->info("暂无需要注册的服务");
             return;
@@ -57,7 +74,7 @@ class RegisterGrpcServiceListener implements ListenerInterface {
             try {
                 foreach ($services as $name) {
                     [$host, $port] = $this->getServers()[$protocol];
-                    if ($governance = $this->governanceManager->get('consul4grpc')) {
+                    if ($governance = $this->governanceManager->get($driverName)) {
                         if (!$governance->isRegistered($name, $host, (int)$port, ['protocol' => $protocol])) {
                             $governance->register($name, $host, $port, ['protocol' => $protocol]);
                         }

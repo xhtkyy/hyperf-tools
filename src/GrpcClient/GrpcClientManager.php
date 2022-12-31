@@ -9,35 +9,39 @@ use Hyperf\Grpc\StatusCode;
 use Hyperf\LoadBalancer\LoadBalancerManager;
 use Hyperf\LoadBalancer\Node;
 use Hyperf\ServiceGovernance\DriverManager;
+use Psr\Log\LoggerInterface;
 use Xhtkyy\HyperfTools\App\ContainerInterface;
 
 class GrpcClientManager {
-    private string $governanceDriverPath;
     private string|null $credentials = null;
     private array $pools = [];
 
     protected DriverManager $governanceManager;
     protected ConfigInterface $config;
+    protected LoggerInterface $logger;
 
     public function __construct(protected ContainerInterface $container) {
-        $this->config               = $this->container->get(ConfigInterface::class);
-        $this->governanceManager    = $this->container->get(DriverManager::class);
-        $this->governanceDriverPath = $this->config->get("kyy_tools.consul.hostname", "consul:8500");
+        $this->config            = $this->container->get(ConfigInterface::class);
+        $this->governanceManager = $this->container->get(DriverManager::class);
+        $this->logger            = $this->container->get(LoggerInterface::class);
     }
 
     public function getNode(string $server): string {
-        if ($governance = $this->governanceManager->get('consul4grpc')) {
+        $serverName       = $this->config->get("kyy_tools.register.server_name", "nacos");
+        $consulDriverPath = $serverName == "nacos" ? "" : $this->config->get("services.drivers.consul.uri", "consul:8500");
+        $algo             = $this->config->get("kyy_tools.register.algo", "round-robin");
+        if ($governance = $this->governanceManager->get($serverName)) {
             try {
                 /**
                  * @var LoadBalancerManager $loadBalancerManager
                  */
                 $loadBalancerManager = $this->container->get(LoadBalancerManager::class);
-                $serverLB            = $loadBalancerManager->getInstance($server, "round-robin");
+                $serverLB            = $loadBalancerManager->getInstance($server, $algo);
                 if (!$serverLB->isAutoRefresh()) {
-                    $fun = function () use ($governance, $server) {
+                    $fun = function () use ($governance, $server, $consulDriverPath) {
                         $nodes = [];
-                        foreach ($governance->getNodes($this->governanceDriverPath, $server, ['protocol' => 'grpc']) as $node) {
-                            $nodes[] = new Node($node['host'], $node['port']);
+                        foreach ($governance->getNodes($consulDriverPath, $server, ['protocol' => 'grpc']) as $node) {
+                            $nodes[] = new Node($node['host'], $node['port'], $node['weight'] ?? 1);
                         }
                         return $nodes;
                     };
@@ -47,7 +51,7 @@ class GrpcClientManager {
                 $node = $serverLB->select();
                 return sprintf("%s:%d", $node->host, $node->port);
             } catch (\Throwable $throwable) {
-                //todo 日志
+                $this->logger->error(sprintf("服务(%s)获取失败 策略：%s 原因：%s", $serverName, $algo, $throwable->getMessage()));
             }
         }
         return "";
@@ -96,7 +100,7 @@ class GrpcClientManager {
         try {
             return $this->getClient($hostname, $method)->invoke($method, $argument, $deserialize, $metadata, $options);
         } catch (Exception $e) {
-            //todo 写入日志
+            $this->logger->error(sprintf("服务Client获取失败 %s %s,错误信息：%s", $hostname, $method, $e->getMessage()));
             return [null, StatusCode::ABORTED];
         }
     }
