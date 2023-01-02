@@ -50,6 +50,12 @@ class ConfigProvider {
                     'source'      => __DIR__ . '/../publish/kyy_tools.php',
                     'destination' => BASE_PATH . '/config/autoload/kyy_tools.php',
                 ],
+                [
+                    'id'          => 'config',
+                    'description' => 'The config for tracer.',
+                    'source'      => __DIR__ . '/../publish/opentracing.php',
+                    'destination' => BASE_PATH . '/config/autoload/opentracing.php',
+                ],
             ]
         ];
     }

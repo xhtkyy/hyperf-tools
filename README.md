@@ -99,3 +99,7 @@ Router::addServer('grpc', function () {
 #### 3、服务发现
 
 使用继承 \Xhtkyy\HyperfTools\GrpcClient\BaseGrpcClient 即可完成服务自动发现 可在配置中配置发现算法 默认轮询
+
+### 链路追踪
+
+使用 Xhtkyy\HyperfTools\Grpc\Middleware\GrpcTraceMiddleware 作用于grpc服务路由即可完成 grpc链路追踪
