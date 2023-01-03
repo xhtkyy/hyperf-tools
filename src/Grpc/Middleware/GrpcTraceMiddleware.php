@@ -8,6 +8,7 @@ use Hyperf\Rpc\Context;
 use Hyperf\Tracer\SpanStarter;
 use Hyperf\Tracer\SpanTagManager;
 use OpenTracing\Tracer;
+use Hyperf\Contract\ConfigInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -22,20 +23,22 @@ class GrpcTraceMiddleware implements MiddlewareInterface {
 
     private Tracer $tracer;
 
-    private SpanTagManager $spanTagManager;
-
-    private Context $context;
+    private ConfigInterface $config;
 
     public function __construct(private ContainerInterface $container) {
         $this->tracer         = $container->get(Tracer::class);
-        $this->spanTagManager = $container->get(SpanTagManager::class);
-        $this->context        = $container->get(Context::class);
+        $this->config         = $container->get(ConfigInterface::class);
     }
 
     /**
      * @throws Throwable
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface {
+        // 是否全局关闭 链路追踪
+        if (!$this->config->get("kyy_tools.trace", true)) {
+            return $handler->handle($request);
+        }
+
         $option = [];
         // 判断存在传递的父节点
         if ($request->hasHeader("tracer.carrier")) {
@@ -66,7 +69,7 @@ class GrpcTraceMiddleware implements MiddlewareInterface {
             $span->setTag('rpc.message', $response->getTrailer("grpc-message"));
         } catch (Throwable $e) {
             $span->setTag('error', true);
-            $span->log(['message', $e->getMessage(), 'code' => $e->getCode(), 'stacktrace' => $e->getTraceAsString()]);
+            $span->log(['message' => $e->getMessage(), 'code' => $e->getCode(), 'stacktrace' => $e->getTraceAsString()]);
             throw $e;
         } finally {
             //提交
