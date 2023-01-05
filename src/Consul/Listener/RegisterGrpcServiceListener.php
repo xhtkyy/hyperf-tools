@@ -52,12 +52,13 @@ class RegisterGrpcServiceListener implements ListenerInterface {
         $serverName = $this->config->get("kyy_tools.register.server_name", "grpc");
         $driverName = $this->config->get("kyy_tools.register.driver_name", "nacos");
         $services   = [];
+        $routes     = $this->dispatcherFactory
+            ->getRouter($serverName)
+            ->getData();
         /**
          * @var Handler $handler
          */
-        foreach ($this->dispatcherFactory
-                     ->getRouter($serverName)
-                     ->getData()[0]['POST'] as $handler) {
+        if (!empty($routes) && isset($routes[0]['POST'])) foreach ($routes[0]['POST'] as $handler) {
             if (isset($handler->options['register']) && !$handler->options['register']) {
                 continue;
             }
