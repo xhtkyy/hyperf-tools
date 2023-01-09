@@ -28,7 +28,7 @@ class RolesReply extends \Google\Protobuf\Internal\Message
      * }
      */
     public function __construct($data = NULL) {
-        \App\Grpc\GPBMetadata\Casbin::initOnce();
+        \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\GPBMetadata\Casbin::initOnce();
         parent::__construct($data);
     }
 
