@@ -15,6 +15,8 @@ namespace Xhtkyy\HyperfTools;
 use DtmClient\Api\GrpcApi;
 use Xhtkyy\HyperfTools\App\Container;
 use Xhtkyy\HyperfTools\App\ContainerInterface;
+use Xhtkyy\HyperfTools\Casbin\CasbinInterface;
+use Xhtkyy\HyperfTools\Casbin\src\Casbin;
 use Xhtkyy\HyperfTools\Consul\Listener\RegisterConsul4GrpcDriverListener;
 use Xhtkyy\HyperfTools\Consul\Listener\RegisterGrpcServiceListener;
 use Xhtkyy\HyperfTools\Dtm\DtmGrpcApi;
@@ -29,6 +31,7 @@ class ConfigProvider {
                 GrpcApi::class            => DtmGrpcApi::class,
                 //接管容器
                 ContainerInterface::class => Container::class,
+                CasbinInterface::class => Casbin::class
             ],
             'commands'     => [
             ],
