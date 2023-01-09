@@ -5,7 +5,6 @@ namespace Xhtkyy\HyperfTools\Casbin\src;
 use Hyperf\Grpc\StatusCode;
 use Xhtkyy\HyperfTools\Casbin\CasbinInterface;
 use Xhtkyy\HyperfTools\Casbin\src\GrpcClient\BoolReply;
-use Xhtkyy\HyperfTools\Casbin\src\GrpcClient\CasbinClient;
 use Xhtkyy\HyperfTools\Casbin\src\GrpcClient\Permissions;
 use Xhtkyy\HyperfTools\Casbin\src\GrpcClient\PermissionUserReq;
 use Xhtkyy\HyperfTools\Casbin\src\GrpcClient\PoliciesReq;

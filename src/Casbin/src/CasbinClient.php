@@ -1,26 +1,19 @@
 <?php
 // GENERATED CODE -- DO NOT EDIT!
 
-namespace Xhtkyy\HyperfTools\Casbin\src\GrpcClient;
+namespace Xhtkyy\HyperfTools\Casbin\src;
+
+use Xhtkyy\HyperfTools\GrpcClient\BaseGrpcClient;
 
 /**
  */
-class CasbinClient extends \Grpc\BaseStub {
-
-    /**
-     * @param string $hostname hostname
-     * @param array $opts channel options
-     * @param \Grpc\Channel $channel (optional) re-use channel object
-     */
-    public function __construct($hostname, $opts, $channel = null) {
-        parent::__construct($hostname, $opts, $channel);
-    }
+class CasbinClient extends BaseGrpcClient {
 
     /**
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function getRolesForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument,
       $metadata = [], $options = []) {
@@ -34,7 +27,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\RoleReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function getUsersForRole(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\RoleReq $argument,
       $metadata = [], $options = []) {
@@ -48,7 +41,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserRoleReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function hasRoleForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserRoleReq $argument,
       $metadata = [], $options = []) {
@@ -62,7 +55,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserRoleReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function addRoleForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserRoleReq $argument,
       $metadata = [], $options = []) {
@@ -76,7 +69,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserRoleReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function deleteRoleForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserRoleReq $argument,
       $metadata = [], $options = []) {
@@ -90,7 +83,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function deleteRolesForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument,
       $metadata = [], $options = []) {
@@ -104,7 +97,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function deleteUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument,
       $metadata = [], $options = []) {
@@ -118,7 +111,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\RoleReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function deleteRole(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\RoleReq $argument,
       $metadata = [], $options = []) {
@@ -132,7 +125,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\Permissions $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function deletePermission(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\Permissions $argument,
       $metadata = [], $options = []) {
@@ -146,7 +139,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\PermissionUserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function addPermissionForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\PermissionUserReq $argument,
       $metadata = [], $options = []) {
@@ -160,7 +153,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\PermissionUserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function deletePermissionForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\PermissionUserReq $argument,
       $metadata = [], $options = []) {
@@ -174,7 +167,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function deletePermissionsForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument,
       $metadata = [], $options = []) {
@@ -188,7 +181,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function getPermissionsForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument,
       $metadata = [], $options = []) {
@@ -202,7 +195,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\PermissionUserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function hasPermissionForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\PermissionUserReq $argument,
       $metadata = [], $options = []) {
@@ -216,7 +209,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function getImplicitRolesForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument,
       $metadata = [], $options = []) {
@@ -230,7 +223,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function getImplicitPermissionsForUser(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument,
       $metadata = [], $options = []) {
@@ -244,7 +237,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\Permissions $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function getImplicitUsersForPermission(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\Permissions $argument,
       $metadata = [], $options = []) {
@@ -258,7 +251,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\RoleReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function getUsersForRoleInDomain(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\RoleReq $argument,
       $metadata = [], $options = []) {
@@ -272,7 +265,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function getRolesForUserInDomain(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument,
       $metadata = [], $options = []) {
@@ -286,7 +279,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function getPermissionsForUserInDomain(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserReq $argument,
       $metadata = [], $options = []) {
@@ -300,7 +293,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserRoleReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function addRoleForUserInDomain(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserRoleReq $argument,
       $metadata = [], $options = []) {
@@ -314,7 +307,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserRoleReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function deleteRoleForUserInDomain(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\UserRoleReq $argument,
       $metadata = [], $options = []) {
@@ -328,7 +321,7 @@ class CasbinClient extends \Grpc\BaseStub {
      * @param \Xhtkyy\HyperfTools\Casbin\src\GrpcClient\PoliciesReq $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return array
      */
     public function addPolicies(\Xhtkyy\HyperfTools\Casbin\src\GrpcClient\PoliciesReq $argument,
       $metadata = [], $options = []) {
