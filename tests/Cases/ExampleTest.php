@@ -19,6 +19,9 @@ class ExampleTest extends AbstractTestCase
 {
     public function testExample()
     {
+        $struct = array_to_struct(["a" => 111,"b" => "222"]);
+        $array = struct_to_array($struct);
+        var_dump($array);
         $this->assertTrue(true);
     }
 }
