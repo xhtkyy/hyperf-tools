@@ -61,3 +61,12 @@ if (!function_exists("repeated_field_to_array")) {
         });
     }
 }
+if (!function_exists("array_merge_by_key")) {
+    function array_merge_by_key(array $array, string|int $key, $column = ""): array {
+        $new = [];
+        foreach ($array as $item) {
+            if (isset($item[$key])) $new[$item[$key]][] = $column != "" ? array_column($item, $column) : $item;
+        }
+        return $new;
+    }
+}
