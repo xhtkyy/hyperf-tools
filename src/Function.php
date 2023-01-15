@@ -23,7 +23,23 @@ if (!function_exists('di')) {
 
 if (!function_exists('struct_to_array')) {
     function struct_to_array(Struct|Message $struct): array {
-        return json_decode($struct->serializeToJsonString(), true);
+        return $struct instanceof Struct ? json_decode($struct->serializeToJsonString(), true) : message_to_array($struct);
+    }
+}
+
+if (!function_exists('message_to_array')) {
+    /**
+     * proto message 对象转数组,需要消耗性能的
+     */
+    function message_to_array(Message $object): array {
+        $reflectionClass = new ReflectionClass(get_class($object));
+        $array           = array();
+        foreach ($reflectionClass->getProperties() as $property) {
+            $property->setAccessible(true);
+            $array[$property->getName()] = $property->getValue($object);
+            $property->setAccessible(false);
+        }
+        return $array;
     }
 }
 
