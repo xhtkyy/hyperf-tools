@@ -76,7 +76,7 @@ if (!function_exists("check_param_and_call")) {
         $fields = is_array($fields) ? $fields : explode(",", $fields);
         foreach ($fields as $field) {
             if (isset($param[$field]) && $param[$field] != "") {
-                $fun($param[$field]);
+                $fun($field, $param[$field]);
             }
         }
     }
