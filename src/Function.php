@@ -70,3 +70,14 @@ if (!function_exists("array_merge_by_key")) {
         return $new;
     }
 }
+
+if (!function_exists("check_param_and_call")) {
+    function check_param_and_call(array $param, string|array $fields, callable $fun): void {
+        $fields = is_array($fields) ? $fields : explode(",", $fields);
+        foreach ($fields as $field) {
+            if (isset($param[$field]) && $param[$field] != "") {
+                $fun($param[$field]);
+            }
+        }
+    }
+}
