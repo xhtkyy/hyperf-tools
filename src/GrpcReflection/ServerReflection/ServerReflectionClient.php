@@ -20,12 +20,9 @@
 //
 namespace Xhtkyy\HyperfTools\GrpcReflection\ServerReflection;
 
-use Hyperf\GrpcClient\BaseClient;
-use Hyperf\GrpcClient\BidiStreamingCall;
-
 /**
  */
-class ServerReflectionClient extends BaseClient {
+class ServerReflectionClient extends \Grpc\BaseStub {
 
     /**
      * @param string $hostname hostname
@@ -41,7 +38,7 @@ class ServerReflectionClient extends BaseClient {
      * all related requests go to a single server.
      * @param array $metadata metadata
      * @param array $options call options
-     * @return BidiStreamingCall
+     * @return \Grpc\BidiStreamingCall
      */
     public function ServerReflectionInfo($metadata = [], $options = []) {
         return $this->_bidiRequest('/grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo',
