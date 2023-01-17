@@ -10,5 +10,7 @@ return [
     "reflection" => [
         "enable" => env("REFLECTION_ENABLE", true), //是否开启服务反射 默认是true
         "path"   => env("REFLECTION_PATH", 'app/Grpc/GPBMetadata'), //反射路径 指protoc生成的GPBMetadata文件路径
+        "base_class" => [],
+        "route_to_proto_pattern" => "/(.*?)Srv/"
     ]
 ];

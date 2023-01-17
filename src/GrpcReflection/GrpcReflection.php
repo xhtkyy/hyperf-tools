@@ -22,12 +22,14 @@ class GrpcReflection implements ServerReflectionInterface {
 
     protected array $servers = [];
     protected array $files = [];
+    protected array $baseProtoFiles = [];
 
     public function __construct(protected ContainerInterface $container) {
         $this->config            = $this->container->get(ConfigInterface::class);
         $this->dispatcherFactory = $this->container->get(DispatcherFactory::class);
         //获取服务
-        $this->servers = $this->servers();
+        $this->servers        = $this->servers();
+        $this->baseProtoFiles = $this->baseProtoFiles($this->config->get("kyy_tools.reflection.base_class", []));
     }
 
     /**
@@ -48,7 +50,7 @@ class GrpcReflection implements ServerReflectionInterface {
                 );
                 break;
             case "file_containing_symbol":
-                list($files, $symbol) = [[], $request->getFileContainingSymbol()];
+                list($files, $symbol) = [$this->baseProtoFiles, $request->getFileContainingSymbol()];
                 if (isset($this->servers[$symbol])) foreach ($this->servers[$symbol] as $filePath) {
                     $files[] = $this->protoFileContent($filePath);
                 }
@@ -80,6 +82,9 @@ class GrpcReflection implements ServerReflectionInterface {
     }
 
     private function protoFilePaths(string $serverName): array {
+        //todo 需要解决名字不同步问题
+        $pattern        = $this->config->get("kyy_tools.reflection.route_to_proto_pattern", "/(.*?)Srv/");
+        $serverName     = Str::match($pattern, $serverName);
         $protoFilePaths = [];
         $basePath       = $this->config->get("kyy_tools.reflection.path", "app/Grpc/GPBMetadata");
         foreach (explode(".", $serverName) as $item) {
@@ -104,5 +109,23 @@ class GrpcReflection implements ServerReflectionInterface {
             $this->files[$filePath] = $file;
         }
         return $this->files[$filePath];
+    }
+
+    private function baseProtoFiles(array $protoClass): array {
+        $files = [];
+        foreach ($protoClass as $class) {
+            try {
+                $path = (new \ReflectionClass($class))->getFileName();
+                if ($path) {
+                    $files[] = $this->protoFileContent($path);
+                };
+            } catch (\ReflectionException $e) {
+            }
+            // google proto file
+            if (str_contains($class, 'Google\Protobuf')) {
+                $files[] = $this->protoFileContent("vendor/google/protobuf/src/" . str_replace("\\", "/", $class . ".php"));
+            }
+        }
+        return $files;
     }
 }
