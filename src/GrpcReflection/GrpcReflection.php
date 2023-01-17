@@ -82,7 +82,7 @@ class GrpcReflection implements ServerReflectionInterface {
     }
 
     private function protoFilePaths(string $serverName): array {
-        //todo 需要解决名字不同步问题
+        //todo 需要解决名字不同步问题，可考虑 通过路由把proto文件名称带过来
         $pattern        = $this->config->get("kyy_tools.reflection.route_to_proto_pattern", "/(.*?)Srv/");
         $serverName     = Str::match($pattern, $serverName);
         $protoFilePaths = [];
