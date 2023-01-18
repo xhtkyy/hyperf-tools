@@ -9,10 +9,10 @@ use Xhtkyy\HyperfTools\GrpcReflection\GrpcReflection;
 
 class GrpcHelper {
     //注册反射
-    public static function RegisterRoute(callable $callback, string $serverName = "grpc"): void {
+    public static function RegisterRoutes(callable $callback, string $serverName = "grpc"): void {
         Router::addServer($serverName, function () use ($callback) {
             //注册反射
-            if (di(ConfigInterface::class)->get("kyy_tools.reflection.enable", true)) {
+            if (env("REFLECTION_ENABLE", true)) {
                 Router::addGroup('/grpc.reflection.v1alpha.ServerReflection', function () {
                     Router::post('/ServerReflectionInfo', [GrpcReflection::class, 'serverReflectionInfo']);
                 }, [
