@@ -29,7 +29,7 @@ class GrpcReflection implements ServerReflectionInterface {
         $this->dispatcherFactory = $this->container->get(DispatcherFactory::class);
         //获取服务
         $this->servers        = $this->servers();
-        $this->baseProtoFiles = $this->baseProtoFiles($this->config->get("kyy_tools.reflection.base_class", []));
+        $this->baseProtoFiles = $this->getProtoFilePathsByClass($this->config->get("kyy_tools.reflection.base_class", []));
     }
 
     /**
@@ -50,9 +50,11 @@ class GrpcReflection implements ServerReflectionInterface {
                 );
                 break;
             case "file_containing_symbol":
-                list($files, $symbol) = [$this->baseProtoFiles, $request->getFileContainingSymbol()];
-                if (isset($this->servers[$symbol])) foreach ($this->servers[$symbol] as $filePath) {
-                    $files[] = $this->protoFileContent($filePath);
+                list($files, $symbol) = [[], $request->getFileContainingSymbol()];
+                if (isset($this->servers[$symbol]) && is_array($this->servers[$symbol])) {
+                    foreach (array_merge($this->servers[$symbol], $this->baseProtoFiles) as $filePath) {
+                        $files[] = $this->getProtoFileContent($filePath);
+                    }
                 }
                 // 设置到响应
                 $resp->setFileDescriptorResponse(
@@ -74,15 +76,22 @@ class GrpcReflection implements ServerReflectionInterface {
         if (!empty($routes) && isset($routes[0]['POST'])) foreach ($routes[0]['POST'] as $handler) {
             $service = current(explode("/", trim($handler->route, "/")));
             if (!isset($services[$service])) {
-                $files = $this->protoFilePaths($service);
+                if (isset($handler->options['protobuf_class']) && !empty($handler->options['protobuf_class'])) {
+                    //指定获取
+                    $files = $this->getProtoFilePathsByClass(
+                        is_array($handler->options['protobuf_class']) ? $handler->options['protobuf_class'] : [$handler->options['protobuf_class']]
+                    );
+                } else {
+                    //自动获取
+                    $files = $this->getProtoFilePathsByServer($service);
+                }
                 !empty($files) && $services[$service] = $files;
             }
         }
         return $services;
     }
 
-    private function protoFilePaths(string $serverName): array {
-        //todo 需要解决名字不同步问题，可考虑 通过路由把proto文件名称带过来
+    private function getProtoFilePathsByServer(string $serverName): array {
         $pattern        = $this->config->get("kyy_tools.reflection.route_to_proto_pattern", "/(.*?)Srv/");
         $serverName     = Str::match($pattern, $serverName);
         $protoFilePaths = [];
@@ -96,7 +105,7 @@ class GrpcReflection implements ServerReflectionInterface {
         return $protoFilePaths;
     }
 
-    private function protoFileContent(string $filePath) {
+    private function getProtoFileContent(string $filePath) {
         if (!isset($this->files[$filePath])) {
             // 读取
             $file = file_get_contents($filePath);
@@ -111,19 +120,20 @@ class GrpcReflection implements ServerReflectionInterface {
         return $this->files[$filePath];
     }
 
-    private function baseProtoFiles(array $protoClass): array {
+    private function getProtoFilePathsByClass(array $protoClass): array {
         $files = [];
         foreach ($protoClass as $class) {
             try {
                 $path = (new \ReflectionClass($class))->getFileName();
                 if ($path) {
-                    $files[] = $this->protoFileContent($path);
+                    $files[] = $path;
+                    continue;
                 };
             } catch (\ReflectionException $e) {
             }
             // google proto file
             if (str_contains($class, 'Google\Protobuf')) {
-                $files[] = $this->protoFileContent("vendor/google/protobuf/src/" . str_replace("\\", "/", $class . ".php"));
+                $files[] = "vendor/google/protobuf/src/" . str_replace("\\", "/", $class . ".php");
             }
         }
         return $files;
