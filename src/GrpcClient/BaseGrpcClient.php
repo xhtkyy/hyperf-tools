@@ -44,12 +44,13 @@ class BaseGrpcClient {
         }
 
         $client = $this->container->get(GrpcClientManager::class);
-
+        $res    = $client->invoke($this->hostname, $method, $argument, $deserialize, $metadata, $options);
         /**
          *
          * @var Response $resp
          */
-        list($reply, $status, $resp) = $client->invoke($this->hostname, $method, $argument, $deserialize, $metadata, $options);
+        list($reply, $status) = $res;
+        $resp = $res[2] ?? null;
         // 判断是否需要追踪
         if ($trace_enable && $this->is_tracer) {
             $key  = "GRPC Client Response [RPC] {$method}";
