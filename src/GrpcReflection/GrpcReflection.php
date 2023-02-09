@@ -3,6 +3,8 @@
 namespace Xhtkyy\HyperfTools\GrpcReflection;
 
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Grpc\StatusCode;
+use Hyperf\GrpcServer\Exception\GrpcException;
 use Hyperf\HttpServer\Router\DispatcherFactory;
 use Hyperf\HttpServer\Router\Handler;
 use Hyperf\Utils\Str;
@@ -61,8 +63,26 @@ class GrpcReflection implements ServerReflectionInterface {
                     (new FileDescriptorResponse())->setFileDescriptorProto($files)
                 );
                 break;
+            case "file_by_filename":
+                $fileName = $request->getFileByFilename();;
+                if (str_contains($fileName, 'google/protobuf/')) {
+                    $paths = $this->toGoogleProtobufPath($fileName);
+                    $resp->setFileDescriptorResponse(
+                        (new FileDescriptorResponse())->setFileDescriptorProto([$this->getProtoFileContent($paths)])
+                    );
+                    break;
+                }
+                throw new GrpcException("{$fileName} not found", StatusCode::NOT_FOUND);
         }
         return $resp;
+    }
+
+    private function toGoogleProtobufPath($fileName): string {
+        $start = strpos($fileName, 'google/protobuf/') + 16;
+        $end   = strpos($fileName, '.');
+        $class = substr($fileName, $start, $end - $start);
+        if ($class == "empty") $class = "GPBEmpty";
+        return $this->getProtoFilePathsByClass(["GPBMetadata\\Google\\Protobuf\\" . Str::studly($class)])[0] ?? '';
     }
 
     private function servers(): array {
