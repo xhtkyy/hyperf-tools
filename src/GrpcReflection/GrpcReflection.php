@@ -64,7 +64,7 @@ class GrpcReflection implements ServerReflectionInterface {
                 );
                 break;
             case "file_by_filename":
-                $fileName = $request->getFileByFilename();;
+                $fileName = $request->getFileByFilename();
                 if (str_contains($fileName, 'google/protobuf/')) {
                     $paths = $this->toGoogleProtobufPath($fileName);
                     $resp->setFileDescriptorResponse(
@@ -130,11 +130,15 @@ class GrpcReflection implements ServerReflectionInterface {
             // 读取
             $file = file_get_contents($filePath);
             // 获取proto生成的内容
-            $start                  = strpos($file, "'", 121) + 1;
-            $end                    = strpos($file, "'", $start);
-            $file                   = substr($file, $start, $end - $start);
-            $file                   = str_replace('\\\\', "\\", $file);
-            $file                   = str_replace(substr($file, 1, 3), "", $file);
+            $start = strpos($file, "'", 121) + 1;
+            // 暂时只支持proto3
+            $end  = strpos($file, "proto3'", $start) + 6;
+            $file = substr($file, $start, $end - $start);
+            $file = str_replace('\\\\', "\\", $file);
+            $file = str_replace(substr($file, 1, 3), "", $file);
+            //解决php返斜杠导致的报错
+            $file = str_replace("\'", "'", $file);
+            //存
             $this->files[$filePath] = $file;
         }
         return $this->files[$filePath];
