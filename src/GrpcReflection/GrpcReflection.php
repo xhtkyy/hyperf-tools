@@ -16,7 +16,8 @@ use Xhtkyy\HyperfTools\GrpcReflection\ServerReflection\ServerReflectionRequest;
 use Xhtkyy\HyperfTools\GrpcReflection\ServerReflection\ServerReflectionResponse;
 use Xhtkyy\HyperfTools\GrpcReflection\ServerReflection\ServiceResponse;
 
-class GrpcReflection implements ServerReflectionInterface {
+class GrpcReflection implements ServerReflectionInterface
+{
 
     protected ConfigInterface $config;
 
@@ -26,11 +27,12 @@ class GrpcReflection implements ServerReflectionInterface {
     protected array $files = [];
     protected array $baseProtoFiles = [];
 
-    public function __construct(protected ContainerInterface $container) {
-        $this->config            = $this->container->get(ConfigInterface::class);
+    public function __construct(protected ContainerInterface $container)
+    {
+        $this->config = $this->container->get(ConfigInterface::class);
         $this->dispatcherFactory = $this->container->get(DispatcherFactory::class);
         //获取服务
-        $this->servers        = $this->servers();
+        $this->servers = $this->servers();
         $this->baseProtoFiles = $this->getProtoFilePathsByClass($this->config->get("kyy_tools.reflection.base_class", []));
     }
 
@@ -38,7 +40,8 @@ class GrpcReflection implements ServerReflectionInterface {
      * @param ServerReflectionRequest $request
      * @return ServerReflectionResponse
      */
-    public function serverReflectionInfo(ServerReflectionRequest $request): ServerReflectionResponse {
+    public function serverReflectionInfo(ServerReflectionRequest $request): ServerReflectionResponse
+    {
         $resp = new ServerReflectionResponse();
         $resp->setOriginalRequest($request);
         switch ($request->getMessageRequest()) {
@@ -72,21 +75,31 @@ class GrpcReflection implements ServerReflectionInterface {
                     );
                     break;
                 }
+                $filePath = current($this->getProtoFilePathsByName(last(explode("/", $fileName))));
+                if ($fileName) {
+                    $resp->setFileDescriptorResponse(
+                        (new FileDescriptorResponse())->setFileDescriptorProto([$this->getProtoFileContent($filePath)])
+                    );
+                    break;
+                }
+
                 throw new GrpcException("{$fileName} not found", StatusCode::NOT_FOUND);
         }
         return $resp;
     }
 
-    private function toGoogleProtobufPath($fileName): string {
+    private function toGoogleProtobufPath($fileName): string
+    {
         $start = strpos($fileName, 'google/protobuf/') + 16;
-        $end   = strpos($fileName, '.');
+        $end = strpos($fileName, '.');
         $class = substr($fileName, $start, $end - $start);
         if ($class == "empty") $class = "GPBEmpty";
         return $this->getProtoFilePathsByClass(["GPBMetadata\\Google\\Protobuf\\" . Str::studly($class)])[0] ?? '';
     }
 
-    private function servers(): array {
-        $routes   = $this->dispatcherFactory
+    private function servers(): array
+    {
+        $routes = $this->dispatcherFactory
             ->getRouter($this->config->get("kyy_tools.register.server_name", "grpc"))
             ->getData();
         $services = [];
@@ -111,12 +124,18 @@ class GrpcReflection implements ServerReflectionInterface {
         return $services;
     }
 
-    private function getProtoFilePathsByServer(string $serverName): array {
-        $pattern        = $this->config->get("kyy_tools.reflection.route_to_proto_pattern", "/(.*?)Srv/");
-        $serverName     = Str::match($pattern, $serverName);
+    private function getProtoFilePathsByServer(string $serverName): array
+    {
+        $pattern = $this->config->get("kyy_tools.reflection.route_to_proto_pattern", "/(.*?)Srv/");
+        $serverName = Str::match($pattern, $serverName);
+        return $this->getProtoFilePathsByName($serverName);
+    }
+
+    private function getProtoFilePathsByName($name): array
+    {
         $protoFilePaths = [];
-        $basePath       = $this->config->get("kyy_tools.reflection.path", "app/Grpc/GPBMetadata");
-        foreach (explode(".", $serverName) as $item) {
+        $basePath = $this->config->get("kyy_tools.reflection.path", "app/Grpc/GPBMetadata");
+        foreach (explode(".", $name) as $item) {
             $file = $basePath . "/" . Str::studly($item) . ".php";
             if (!in_array($file, $protoFilePaths) && file_exists($file)) {
                 $protoFilePaths[] = $file;
@@ -125,14 +144,15 @@ class GrpcReflection implements ServerReflectionInterface {
         return $protoFilePaths;
     }
 
-    private function getProtoFileContent(string $filePath) {
+    private function getProtoFileContent(string $filePath)
+    {
         if (!isset($this->files[$filePath])) {
             // 读取
             $file = file_get_contents($filePath);
             // 获取proto生成的内容
             $start = strpos($file, "'", 121) + 1;
             // 暂时只支持proto3
-            $end  = strpos($file, "proto3'", $start) + 6;
+            $end = strpos($file, "proto3'", $start) + 6;
             $file = substr($file, $start, $end - $start);
             $file = str_replace('\\\\', "\\", $file);
             $file = str_replace(substr($file, 1, 3), "", $file);
@@ -144,7 +164,8 @@ class GrpcReflection implements ServerReflectionInterface {
         return $this->files[$filePath];
     }
 
-    private function getProtoFilePathsByClass(array $protoClass): array {
+    private function getProtoFilePathsByClass(array $protoClass): array
+    {
         $files = [];
         foreach ($protoClass as $class) {
             try {
