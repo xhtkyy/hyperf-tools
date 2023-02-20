@@ -57,7 +57,7 @@ class GrpcClientManager
                 }
                 return $serverLB->select();
             } catch (\Throwable $throwable) {
-                $this->logger->error(sprintf("服务 %s 在 %s 获取失败 策略：%s 原因：%s", $server, $driverName, $algo, $throwable->getMessage()));
+                $this->logger->error(sprintf("服务 %s 在 %s 获取失败 策略：%s 原因：%s", $server, $driverName, $this->algo, $throwable->getMessage()));
             }
         }
         return null;
