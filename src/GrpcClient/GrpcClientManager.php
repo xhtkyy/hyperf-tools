@@ -13,31 +13,37 @@ use Hyperf\ServiceGovernance\DriverManager;
 use Psr\Log\LoggerInterface;
 use Xhtkyy\HyperfTools\App\ContainerInterface;
 
-class GrpcClientManager {
+class GrpcClientManager
+{
     private string|null $credentials = null;
     private array $pools = [];
 
     protected DriverManager $governanceManager;
     protected ConfigInterface $config;
     protected LoggerInterface $logger;
+    protected string $algo;
 
-    public function __construct(protected ContainerInterface $container) {
-        $this->config            = $this->container->get(ConfigInterface::class);
+    public function __construct(protected ContainerInterface $container)
+    {
+        $this->config = $this->container->get(ConfigInterface::class);
         $this->governanceManager = $this->container->get(DriverManager::class);
-        $this->logger            = $this->container->get(StdoutLoggerInterface::class);
+        $this->logger = $this->container->get(StdoutLoggerInterface::class);
+        //
+        $this->algo = $this->config->get("kyy_tools.register.algo", "round-robin");
     }
 
-    public function getNode(string $server): string {
-        $driverName       = $this->config->get("kyy_tools.register.driver_name", "nacos");
+    public function getNode(string $server): ?Node
+    {
+        var_dump($this->algo);
+        $driverName = $this->config->get("kyy_tools.register.driver_name", "nacos");
         $consulDriverPath = $driverName == "nacos" ? "" : $this->config->get("services.drivers.consul.uri", "consul:8500");
-        $algo             = $this->config->get("kyy_tools.register.algo", "round-robin");
         if ($governance = $this->governanceManager->get($driverName)) {
             try {
                 /**
                  * @var LoadBalancerManager $loadBalancerManager
                  */
                 $loadBalancerManager = $this->container->get(LoadBalancerManager::class);
-                $serverLB            = $loadBalancerManager->getInstance($server, $algo);
+                $serverLB = $loadBalancerManager->getInstance($server, $this->algo);
                 if (!$serverLB->isAutoRefresh()) {
                     $fun = function () use ($governance, $server, $consulDriverPath) {
                         $nodes = [];
@@ -49,13 +55,12 @@ class GrpcClientManager {
                     //设置滚动刷新 异步
                     $serverLB->setNodes($fun())->refresh($fun);
                 }
-                $node = $serverLB->select();
-                return sprintf("%s:%d", $node->host, $node->port);
+                return $serverLB->select();
             } catch (\Throwable $throwable) {
                 $this->logger->error(sprintf("服务 %s 在 %s 获取失败 策略：%s 原因：%s", $server, $driverName, $algo, $throwable->getMessage()));
             }
         }
-        return "";
+        return null;
     }
 
     /**
@@ -65,14 +70,8 @@ class GrpcClientManager {
      * @return GrpcClient
      * @throws Exception
      */
-    public function getClient(string $hostname, string $method): GrpcClient {
-        if (empty($hostname)) {
-            //获取服务名称
-            $server = trim(current(explode(".", $method)), "/");
-            //获取节点地址
-            $hostname = $this->getNode($server);
-        }
-
+    public function getClient(string $hostname, string $method): GrpcClient
+    {
         if (empty($hostname)) {
             throw new Exception("hostname not found!");
         }
@@ -86,21 +85,39 @@ class GrpcClientManager {
         return $this->pools[$hostname];
     }
 
-    public function addClient(string $hostname, GrpcClient $client): void {
+    public function addClient(string $hostname, GrpcClient $client): void
+    {
         $this->pools[$hostname] = $client;
     }
 
-    public function removeClient(string $hostname, GrpcClient $client): void {
+    public function removeClient(string $hostname, GrpcClient $client): void
+    {
         if (isset($this->pools[$hostname])) {
             unset($this->pools[$hostname]);
         }
     }
 
-    public function invoke(string $hostname, string $method, Message $argument, $deserialize, array $metadata = [], array $options = []): array {
+    public function invoke(string $hostname, string $method, Message $argument, $deserialize, array $metadata = [], array $options = []): array
+    {
         //响应
         try {
+            if (empty($hostname)) {
+                //获取服务名称
+                $server = trim(current(explode(".", $method)), "/");
+                //获取节点地址
+                $node = $this->getNode($server);
+                if (!$node) return ["无服务节点", StatusCode::ABORTED];
+                $hostname = sprintf("%s:%d", $node->host, $node->port);
+            }
             return $this->getClient($hostname, $method)->invoke($method, $argument, $deserialize, $metadata, $options);
         } catch (Exception $e) {
+            if (isset($node, $server) && str_contains($e->getMessage(), "Connect failed")) {
+                /**
+                 * @var LoadBalancerManager $loadBalancerManager
+                 */
+                $loadBalancerManager = $this->container->get(LoadBalancerManager::class);
+                $loadBalancerManager->getInstance($server, $this->algo)->removeNode($node);
+            }
             $this->logger->error(sprintf("服务Client获取失败 %s %s,错误信息：%s", $hostname, $method, $e->getMessage()));
             return [null, StatusCode::ABORTED];
         }
