@@ -97,7 +97,7 @@ class GrpcClientManager
         }
     }
 
-    public function invoke(string $hostname, string $method, Message $argument, $deserialize, array $metadata = [], array $options = []): array
+    public function invoke(?string $hostname, string $method, Message $argument, $deserialize, array $metadata = [], array $options = []): array
     {
         //响应
         try {
