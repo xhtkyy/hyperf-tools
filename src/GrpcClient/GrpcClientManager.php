@@ -119,7 +119,7 @@ class GrpcClientManager
                 $instance = $loadBalancerManager->getInstance($server, $this->algo);
                 if ($instance->removeNode($node) && count($instance->getNodes()) > 0) {
                     $this->logger->debug(sprintf("%s 重试获取节点，%s %s", $server, $hostname, $method));
-                    $this->invoke(null, $method, $argument, $deserialize, $metadata, $options);
+                    return $this->invoke(null, $method, $argument, $deserialize, $metadata, $options);
                 }
             }
             $this->logger->error(sprintf("服务Client获取失败 %s %s,错误信息：%s", $hostname, $method, $e->getMessage()));
