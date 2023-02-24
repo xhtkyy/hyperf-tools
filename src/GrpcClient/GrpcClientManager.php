@@ -22,6 +22,8 @@ class GrpcClientManager
     protected ConfigInterface $config;
     protected LoggerInterface $logger;
     protected string $algo;
+    protected array $service_alias = [];
+
 
     public function __construct(protected ContainerInterface $container)
     {
@@ -30,11 +32,14 @@ class GrpcClientManager
         $this->logger = $this->container->get(StdoutLoggerInterface::class);
         //
         $this->algo = $this->config->get("kyy_tools.register.algo", "round-robin");
+        $this->service_alias = $this->config->get("kyy_tools.service_alias", []);
     }
 
     public function getNode(string $server): ?Node
     {
-        var_dump($this->algo);
+        // service alias
+        $server = $this->service_alias[$server] ?? $server . ".grpc";
+
         $driverName = $this->config->get("kyy_tools.register.driver_name", "nacos");
         $consulDriverPath = $driverName == "nacos" ? "" : $this->config->get("services.drivers.consul.uri", "consul:8500");
         if ($governance = $this->governanceManager->get($driverName)) {

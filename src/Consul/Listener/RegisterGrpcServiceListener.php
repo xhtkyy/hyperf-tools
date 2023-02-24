@@ -16,7 +16,8 @@ use Hyperf\ServiceGovernance\ServiceManager;
 use Psr\Log\LoggerInterface;
 use Xhtkyy\HyperfTools\App\ContainerInterface;
 
-class RegisterGrpcServiceListener implements ListenerInterface {
+class RegisterGrpcServiceListener implements ListenerInterface
+{
     protected LoggerInterface $logger;
 
     protected ServiceManager $serviceManager;
@@ -29,31 +30,34 @@ class RegisterGrpcServiceListener implements ListenerInterface {
 
     protected DispatcherFactory $dispatcherFactory;
 
-    public function __construct(ContainerInterface $container) {
+    public function __construct(ContainerInterface $container)
+    {
         try {
-            $this->logger            = $container->get(StdoutLoggerInterface::class);
-            $this->serviceManager    = $container->get(ServiceManager::class);
-            $this->config            = $container->get(ConfigInterface::class);
-            $this->ipReader          = $container->get(IPReaderInterface::class);
+            $this->logger = $container->get(StdoutLoggerInterface::class);
+            $this->serviceManager = $container->get(ServiceManager::class);
+            $this->config = $container->get(ConfigInterface::class);
+            $this->ipReader = $container->get(IPReaderInterface::class);
             $this->governanceManager = $container->get(DriverManager::class);
             $this->dispatcherFactory = $container->get(DispatcherFactory::class);
         } catch (\Throwable $exception) {
         }
     }
 
-    public function listen(): array {
+    public function listen(): array
+    {
         return [
             MainWorkerStart::class,
         ];
     }
 
-    public function process(object $event): void {
-        $continue   = true;
-        $protocol   = 'grpc';
+    public function process(object $event): void
+    {
+        $continue = true;
+        $protocol = 'grpc';
         $serverName = $this->config->get("kyy_tools.register.server_name", "grpc");
         $driverName = $this->config->get("kyy_tools.register.driver_name", "nacos");
-        $services   = [];
-        $routes     = $this->dispatcherFactory
+        $services = [];
+        $routes = $this->dispatcherFactory
             ->getRouter($serverName)
             ->getData();
         /**
@@ -65,7 +69,7 @@ class RegisterGrpcServiceListener implements ListenerInterface {
             }
             $service = trim(current(explode(".", $handler->route)), "/");
             if (!in_array($service, $services)) {
-                $services[] = $service;
+                $services[] = $service . ".$protocol";
             }
         }
         if (empty($services)) {
@@ -108,8 +112,9 @@ class RegisterGrpcServiceListener implements ListenerInterface {
         }
     }
 
-    protected function getServers(): array {
-        $result  = [];
+    protected function getServers(): array
+    {
+        $result = [];
         $servers = $this->config->get('server.servers', []);
         foreach ($servers as $server) {
             if (!isset($server['name'], $server['host'], $server['port'])) {
@@ -129,7 +134,7 @@ class RegisterGrpcServiceListener implements ListenerInterface {
             if (!is_numeric($port) || ($port < 0 || $port > 65535)) {
                 throw new \Exception(sprintf('Invalid port %s', $port));
             }
-            $port                    = (int)$port;
+            $port = (int)$port;
             $result[$server['name']] = [$host, $port];
         }
         return $result;
