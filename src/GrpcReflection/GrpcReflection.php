@@ -137,9 +137,15 @@ class GrpcReflection implements ServerReflectionInterface
         $basePath = $this->config->get("kyy_tools.reflection.path", "app/Grpc/GPBMetadata");
         foreach (explode(".", $name) as $item) {
             $file = $basePath . "/" . Str::studly($item) . ".php";
-            if (!in_array($file, $protoFilePaths) && file_exists($file)) {
-                $protoFilePaths[] = $file;
+            if (!in_array($file, $protoFilePaths)) {
+                if (file_exists($file)) {
+                    $protoFilePaths[] = $file;
+                } elseif (file_exists($basePath . "/v1/" . Str::studly($item) . ".php")) {
+                    $protoFilePaths[] = $basePath . "/v1/" . Str::studly($item) . ".php";
+                }
+
             }
+
         }
         return $protoFilePaths;
     }
