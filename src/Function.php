@@ -37,7 +37,15 @@ if (!function_exists('message_to_array')) {
         foreach ($reflectionClass->getProperties() as $property) {
             $property->setAccessible(true);
             $value                       = $property->getValue($object);
-            $array[$property->getName()] = $value instanceof \Google\Protobuf\Internal\RepeatedField ? repeated_field_to_array($value) : $value;
+            if ($value instanceof \Google\Protobuf\Internal\RepeatedField) {
+                // repeated
+                $array[$property->getName()] = repeated_field_to_array($value);
+            } elseif ($value instanceof Message) {
+                // message
+                $array[$property->getName()] = message_to_array($value);
+            } else {
+                $array[$property->getName()] = $value;
+            }
             $property->setAccessible(false);
         }
         return $array;
