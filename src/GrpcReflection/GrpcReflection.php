@@ -134,18 +134,17 @@ class GrpcReflection implements ServerReflectionInterface
     private function getProtoFilePathsByName($name): array
     {
         $protoFilePaths = [];
-        $basePath = $this->config->get("kyy_tools.reflection.path", "app/Grpc/GPBMetadata");
-        foreach (explode(".", $name) as $item) {
-            $file = $basePath . "/" . Str::studly($item) . ".php";
-            if (!in_array($file, $protoFilePaths)) {
-                if (file_exists($file)) {
-                    $protoFilePaths[] = $file;
-                } elseif (file_exists($basePath . "/v1/" . Str::studly($item) . ".php")) {
-                    $protoFilePaths[] = $basePath . "/v1/" . Str::studly($item) . ".php";
-                }
-
+        $nameAnalyze = explode(".", $name);
+        $length = count($nameAnalyze);
+        $nameAnalyze[$length - 1] = Str::studly(Str::lower($nameAnalyze[$length - 1]));
+        $namespacePath = $this->config->get("kyy_tools.reflection.path", "app/Grpc/GPBMetadata");
+        for ($i = 0; $i < $length; $i++) {
+            $file = $namespacePath . "/" . implode("/", $nameAnalyze) . ".php";
+            if (file_exists($file)) {
+                !in_array($file, $protoFilePaths) && $protoFilePaths[] = $file;
+                break;
             }
-
+            unset($nameAnalyze[$i]);
         }
         return $protoFilePaths;
     }
