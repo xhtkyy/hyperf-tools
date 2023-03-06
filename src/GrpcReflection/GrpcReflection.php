@@ -134,6 +134,7 @@ class GrpcReflection implements ServerReflectionInterface
     private function getProtoFilePathsByName($name): array
     {
         $protoFilePaths = [];
+        if(empty($name)) return $protoFilePaths;
         $nameAnalyze = explode(".", $name);
         $length = count($nameAnalyze);
         $nameAnalyze[$length - 1] = Str::studly(Str::lower($nameAnalyze[$length - 1]));
