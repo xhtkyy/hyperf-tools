@@ -22,45 +22,41 @@ use Xhtkyy\HyperfTools\Consul\Listener\RegisterGrpcServiceListener;
 use Xhtkyy\HyperfTools\Dtm\DtmGrpcApi;
 use Xhtkyy\HyperfTools\Dtm\GrpcClientManagerFactory;
 use Xhtkyy\HyperfTools\GrpcClient\GrpcClientManager;
-use Xhtkyy\HyperfTools\Listener\AutoInitGPBMetadataListener;
 
-class ConfigProvider
-{
-    public function __invoke(): array
-    {
+class ConfigProvider {
+    public function __invoke(): array {
         return [
             'dependencies' => [
-                GrpcClientManager::class => GrpcClientManagerFactory::class,
-                GrpcApi::class => DtmGrpcApi::class,
+                GrpcClientManager::class  => GrpcClientManagerFactory::class,
+                GrpcApi::class            => DtmGrpcApi::class,
                 //接管容器
                 ContainerInterface::class => Container::class,
                 CasbinInterface::class => Casbin::class
             ],
-            'commands' => [
+            'commands'     => [
             ],
-            'annotations' => [
+            'annotations'  => [
                 'scan' => [
                     'paths' => [
                         __DIR__,
                     ],
                 ],
             ],
-            'listeners' => [
+            'listeners'    => [
                 RegisterConsul4GrpcDriverListener::class,
-                RegisterGrpcServiceListener::class,
-                AutoInitGPBMetadataListener::class, //auto load grpc metadata
+                RegisterGrpcServiceListener::class
             ],
-            'publish' => [
+            'publish'      => [
                 [
-                    'id' => 'config',
+                    'id'          => 'config',
                     'description' => 'the config for kyy_tools',
-                    'source' => __DIR__ . '/../publish/kyy_tools.php',
+                    'source'      => __DIR__ . '/../publish/kyy_tools.php',
                     'destination' => BASE_PATH . '/config/autoload/kyy_tools.php',
                 ],
                 [
-                    'id' => 'config',
+                    'id'          => 'config',
                     'description' => 'The config for tracer.',
-                    'source' => __DIR__ . '/../publish/opentracing.php',
+                    'source'      => __DIR__ . '/../publish/opentracing.php',
                     'destination' => BASE_PATH . '/config/autoload/opentracing.php',
                 ],
             ]
