@@ -137,6 +137,12 @@ class GrpcReflection implements ServerReflectionInterface
         if(empty($name)) return $protoFilePaths;
         $nameAnalyze = explode(".", $name);
         $length = count($nameAnalyze);
+
+        if ($nameAnalyze[$length - 1] == "proto") {
+            unset($nameAnalyze[$length - 1]);
+            $length -= 1;
+        }
+
         $nameAnalyze[$length - 1] = Str::studly(Str::lower($nameAnalyze[$length - 1]));
         $namespacePath = $this->config->get("kyy_tools.reflection.path", "app/Grpc/GPBMetadata");
         for ($i = 0; $i < $length; $i++) {
