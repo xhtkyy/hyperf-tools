@@ -48,7 +48,6 @@ class ConfigProvider
             'listeners' => [
                 RegisterConsul4GrpcDriverListener::class,
                 RegisterGrpcServiceListener::class,
-                AutoInitGPBMetadataListener::class, //auto load grpc metadata
             ],
             'publish' => [
                 [
