@@ -2,12 +2,12 @@
 
 namespace Xhtkyy\HyperfTools\GrpcReflection;
 
+use Google\Protobuf\Internal\DescriptorPool;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Grpc\StatusCode;
 use Hyperf\GrpcServer\Exception\GrpcException;
 use Hyperf\HttpServer\Router\DispatcherFactory;
 use Hyperf\HttpServer\Router\Handler;
-use Hyperf\Utils\Str;
 use Xhtkyy\HyperfTools\App\ContainerInterface;
 use Xhtkyy\HyperfTools\GrpcReflection\ServerReflection\FileDescriptorResponse;
 use Xhtkyy\HyperfTools\GrpcReflection\ServerReflection\ListServiceResponse;
@@ -25,7 +25,8 @@ class GrpcReflection implements ServerReflectionInterface
 
     protected array $servers = [];
     protected array $files = [];
-    protected array $baseProtoFiles = [];
+
+    protected array $googleProto = [];
 
     public function __construct(protected ContainerInterface $container)
     {
@@ -33,7 +34,13 @@ class GrpcReflection implements ServerReflectionInterface
         $this->dispatcherFactory = $this->container->get(DispatcherFactory::class);
         //获取服务
         $this->servers = $this->servers();
-        $this->baseProtoFiles = $this->getProtoFilePathsByClass($this->config->get("kyy_tools.reflection.base_class", []));
+        $this->googleProto = [
+            'google/protobuf/struct.proto',
+            'google/protobuf/empty.proto',
+            'google/protobuf/any.proto',
+            'google/protobuf/timestamp.proto',
+            'google/protobuf/duration.proto'
+        ];
     }
 
     /**
@@ -42,6 +49,9 @@ class GrpcReflection implements ServerReflectionInterface
      */
     public function serverReflectionInfo(ServerReflectionRequest $request): ServerReflectionResponse
     {
+        // get gpb class pool
+        $descriptorPool = \Google\Protobuf\Internal\DescriptorPool::getGeneratedPool();
+        // new response
         $resp = new ServerReflectionResponse();
         $resp->setOriginalRequest($request);
         switch ($request->getMessageRequest()) {
@@ -55,48 +65,50 @@ class GrpcReflection implements ServerReflectionInterface
                 );
                 break;
             case "file_containing_symbol":
-                list($files, $symbol) = [[], $request->getFileContainingSymbol()];
-                if (isset($this->servers[$symbol]) && is_array($this->servers[$symbol])) {
-                    foreach (array_merge($this->servers[$symbol], $this->baseProtoFiles) as $filePath) {
-                        $files[] = $this->getProtoFileContent($filePath);
-                    }
+                $symbol = $request->getFileContainingSymbol();
+                $file = $descriptorPool->getContentByServerName($symbol);
+                if (!empty($file)) {
+                    // set file
+                    $resp->setFileDescriptorResponse(
+                        (new FileDescriptorResponse())->setFileDescriptorProto(array_merge(
+                                [$file], $this->googleProto($descriptorPool) //with Google proto
+                            )
+                        )
+                    );
                 }
-                // 设置到响应
-                $resp->setFileDescriptorResponse(
-                    (new FileDescriptorResponse())->setFileDescriptorProto($files)
-                );
                 break;
             case "file_by_filename":
                 $fileName = $request->getFileByFilename();
-                if (str_contains($fileName, 'google/protobuf/')) {
-                    $paths = $this->toGoogleProtobufPath($fileName);
+                $file = $descriptorPool->getContentByProtoName($fileName);
+                if (!empty($fileName)) {
                     $resp->setFileDescriptorResponse(
-                        (new FileDescriptorResponse())->setFileDescriptorProto([$this->getProtoFileContent($paths)])
+                        (new FileDescriptorResponse())->setFileDescriptorProto([$file])
                     );
                     break;
                 }
-                $filePath = current($this->getProtoFilePathsByName(last(explode("/", $fileName))));
-                if ($fileName) {
-                    $resp->setFileDescriptorResponse(
-                        (new FileDescriptorResponse())->setFileDescriptorProto([$this->getProtoFileContent($filePath)])
-                    );
-                    break;
-                }
-
                 throw new GrpcException("{$fileName} not found", StatusCode::NOT_FOUND);
         }
         return $resp;
     }
 
-    private function toGoogleProtobufPath($fileName): string
+    /**
+     * get google proto
+     * @param DescriptorPool $descriptorPool
+     * @return array
+     */
+    private function googleProto(DescriptorPool $descriptorPool): array
     {
-        $start = strpos($fileName, 'google/protobuf/') + 16;
-        $end = strpos($fileName, '.');
-        $class = substr($fileName, $start, $end - $start);
-        if ($class == "empty") $class = "GPBEmpty";
-        return $this->getProtoFilePathsByClass(["GPBMetadata\\Google\\Protobuf\\" . Str::studly($class)])[0] ?? '';
+        $temp = [];
+        foreach ($this->googleProto as $proto) {
+            if ($file = $descriptorPool->getContentByProtoName($proto)) $temp[] = $file;
+        }
+        return $temp;
     }
 
+    /**
+     * get server by router
+     * @return array
+     */
     private function servers(): array
     {
         $routes = $this->dispatcherFactory
@@ -109,84 +121,9 @@ class GrpcReflection implements ServerReflectionInterface
         if (!empty($routes) && isset($routes[0]['POST'])) foreach ($routes[0]['POST'] as $handler) {
             $service = current(explode("/", trim($handler->route, "/")));
             if (!isset($services[$service])) {
-                if (isset($handler->options['protobuf_class']) && !empty($handler->options['protobuf_class'])) {
-                    //指定获取
-                    $files = $this->getProtoFilePathsByClass(
-                        is_array($handler->options['protobuf_class']) ? $handler->options['protobuf_class'] : [$handler->options['protobuf_class']]
-                    );
-                } else {
-                    //自动获取
-                    $files = $this->getProtoFilePathsByServer($service);
-                }
-                !empty($files) && $services[$service] = $files;
+                $services[$service] = '';
             }
         }
         return $services;
-    }
-
-    private function getProtoFilePathsByServer(string $serverName): array
-    {
-        $pattern = $this->config->get("kyy_tools.reflection.route_to_proto_pattern", "/(.*?)Srv/");
-        $serverName = Str::match($pattern, $serverName);
-        return $this->getProtoFilePathsByName($serverName);
-    }
-
-    private function getProtoFilePathsByName($name): array
-    {
-        $protoFilePaths = [];
-        if(empty($name)) return $protoFilePaths;
-        $nameAnalyze = explode(".", $name);
-        $length = count($nameAnalyze);
-        $nameAnalyze[$length - 1] = Str::studly(Str::lower($nameAnalyze[$length - 1]));
-        $namespacePath = $this->config->get("kyy_tools.reflection.path", "app/Grpc/GPBMetadata");
-        for ($i = 0; $i < $length; $i++) {
-            $file = $namespacePath . "/" . implode("/", $nameAnalyze) . ".php";
-            if (file_exists($file)) {
-                !in_array($file, $protoFilePaths) && $protoFilePaths[] = $file;
-                break;
-            }
-            unset($nameAnalyze[$i]);
-        }
-        return $protoFilePaths;
-    }
-
-    private function getProtoFileContent(string $filePath)
-    {
-        if (!isset($this->files[$filePath])) {
-            // 读取
-            $file = file_get_contents($filePath);
-            // 获取proto生成的内容
-            $start = strpos($file, "'", 121) + 1;
-            // 暂时只支持proto3
-            $end = strpos($file, "proto3'", $start) + 6;
-            $file = substr($file, $start, $end - $start);
-            $file = str_replace('\\\\', "\\", $file);
-            $file = str_replace(substr($file, 1, 3), "", $file);
-            //解决php返斜杠导致的报错
-            $file = str_replace("\'", "'", $file);
-            //存
-            $this->files[$filePath] = $file;
-        }
-        return $this->files[$filePath];
-    }
-
-    private function getProtoFilePathsByClass(array $protoClass): array
-    {
-        $files = [];
-        foreach ($protoClass as $class) {
-            try {
-                $path = (new \ReflectionClass($class))->getFileName();
-                if ($path) {
-                    $files[] = $path;
-                    continue;
-                };
-            } catch (\ReflectionException $e) {
-            }
-            // google proto file
-            if (str_contains($class, 'Google\Protobuf')) {
-                $files[] = "vendor/google/protobuf/src/" . str_replace("\\", "/", $class . ".php");
-            }
-        }
-        return $files;
     }
 }
