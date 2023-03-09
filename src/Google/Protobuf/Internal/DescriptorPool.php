@@ -218,11 +218,13 @@ class DescriptorPool
     {
         $content = str_replace('\\\\', "\\", $content);
         $content = str_replace(substr($content, 1, 3), "", $content);
+        var_dump("执行了 ".$file_proto->getName());
         !isset($this->proto_to_content[$file_proto->getName()]) && $this->proto_to_content[$file_proto->getName()] = $content;
         /**
          * @var ServiceDescriptorProto $item
          */
         foreach ($file_proto->getService() as $item) {
+            var_dump("执行了服务 ". $file_proto->getPackage() . "." . $item->getName());
             $this->class_to_proto[$file_proto->getPackage() . "." . $item->getName()] = $file_proto->getName();
         }
     }

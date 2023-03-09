@@ -18,10 +18,7 @@
     "autoload-dev": {
         "psr-4": {
             "HyperfTest\\": "tests"
-        },
-        "files": [
-            "src/Overwrite.php"
-        ]
+        }
     },
     "require": {
         "php": ">=8.0",
