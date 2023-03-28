@@ -33,13 +33,13 @@ class GrpcReflection implements ServerReflectionInterface
     {
         $this->config = $this->container->get(ConfigInterface::class);
         $this->dispatcherFactory = $this->container->get(DispatcherFactory::class);
-        $this->googleProto = [
+        $this->googleProto = array_merge([
             'google/protobuf/struct.proto',
             'google/protobuf/empty.proto',
             'google/protobuf/any.proto',
             'google/protobuf/timestamp.proto',
             'google/protobuf/duration.proto'
-        ];
+        ], $this->config->get('kyy_tools.reflection.base_file', null) ?? []);
 
         try {
             ClassFinder::disablePSR4Vendors();
