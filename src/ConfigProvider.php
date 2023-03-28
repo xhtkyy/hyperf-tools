@@ -51,16 +51,28 @@ class ConfigProvider
             ],
             'publish' => [
                 [
-                    'id' => 'config',
+                    'id' => 'config1',
                     'description' => 'the config for kyy_tools',
                     'source' => __DIR__ . '/../publish/kyy_tools.php',
                     'destination' => BASE_PATH . '/config/autoload/kyy_tools.php',
                 ],
                 [
-                    'id' => 'config',
+                    'id' => 'config2',
                     'description' => 'The config for tracer.',
                     'source' => __DIR__ . '/../publish/opentracing.php',
                     'destination' => BASE_PATH . '/config/autoload/opentracing.php',
+                ],
+                [
+                    'id' => 'overwrite-class-DescriptorPool',
+                    'description' => 'overwrite file',
+                    'source' => __DIR__ . '/../publish/overwrite/src/DescriptorPool.php',
+                    'destination' => BASE_PATH . '/overwrite/src/DescriptorPool.php',
+                ],
+                [
+                    'id' => 'overwrite-file',
+                    'description' => 'overwrite file',
+                    'source' => __DIR__ . '/../publish/overwrite/overwrite.php',
+                    'destination' => BASE_PATH . '/overwrite/overwrite.php',
                 ],
             ]
         ];

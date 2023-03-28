@@ -223,7 +223,7 @@ class DescriptorPool
          * @var ServiceDescriptorProto $item
          */
         foreach ($file_proto->getService() as $item) {
-            $this->class_to_proto[$file_proto->getPackage() . "." . $item->getName()] = $file_proto->getName();
+            $this->class_to_proto[$file_proto->getPackage() . "overwrite" . $item->getName()] = $file_proto->getName();
         }
     }
 }

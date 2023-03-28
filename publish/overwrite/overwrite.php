@@ -7,7 +7,7 @@ declare(strict_types=1);
 
 spl_autoload_register(function ($class) {
     $overwrites = [
-        "Google\Protobuf\Internal\DescriptorPool" =>  __DIR__."/Google/Protobuf/Internal/DescriptorPool.php"
+        "Google\Protobuf\Internal\DescriptorPool" => __DIR__ . "/src/DescriptorPool.php"
     ];
 
     if (isset($overwrites[$class])) include $overwrites[$class];
