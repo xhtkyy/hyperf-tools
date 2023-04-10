@@ -63,6 +63,12 @@ class ConfigProvider
                     'destination' => BASE_PATH . '/config/autoload/opentracing.php',
                 ],
                 [
+                    'id' => 'config3',
+                    'description' => 'The config for services.',
+                    'source' => __DIR__ . '/../publish/services.php',
+                    'destination' => BASE_PATH . '/config/autoload/services.php',
+                ],
+                [
                     'id' => 'overwrite-class-DescriptorPool',
                     'description' => 'overwrite file',
                     'source' => __DIR__ . '/../publish/overwrite/src/DescriptorPool.php',
