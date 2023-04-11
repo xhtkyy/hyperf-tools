@@ -28,10 +28,6 @@ class Retry
                     return true;
                 }
 
-                if ($response && $response->getStatusCode() == 500) {
-                    return true;
-                }
-
                 return false;
             },
             // next try
