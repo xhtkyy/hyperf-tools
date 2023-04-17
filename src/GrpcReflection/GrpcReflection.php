@@ -3,8 +3,8 @@
 namespace Xhtkyy\HyperfTools\GrpcReflection;
 
 use Google\Protobuf\Internal\DescriptorPool;
-use HaydenPierce\ClassFinder\ClassFinder;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Di\ReflectionManager;
 use Hyperf\Grpc\StatusCode;
 use Hyperf\GrpcServer\Exception\GrpcException;
 use Hyperf\HttpServer\Router\DispatcherFactory;
@@ -41,14 +41,9 @@ class GrpcReflection implements ServerReflectionInterface
             'google/protobuf/duration.proto'
         ], $this->config->get('kyy_tools.reflection.base_file', null) ?? []);
 
-        try {
-            ClassFinder::disablePSR4Vendors();
-            //todo 命名空间 需要在配置中获取
-            $class = ClassFinder::getClassesInNamespace("App\\Grpc\\GPBMetadata", ClassFinder::RECURSIVE_MODE);
-        } catch (\Exception $e) {
-            return;
-        }
-        foreach ($class as $item) {
+        $paths = $this->config->get("kyy_tools.reflection.path");
+        $class = ReflectionManager::getAllClasses(is_array($paths) ? $paths : [$paths]);
+        foreach ($class as $item => $reflection) {
             call_user_func("{$item}::initOnce");
         }
 
