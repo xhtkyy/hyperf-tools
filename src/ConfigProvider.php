@@ -84,7 +84,7 @@ class ConfigProvider
                     'id' => 'protoc-auto-file',
                     'description' => 'protoc-auto-file',
                     'source' => __DIR__ . '/../publish/protoc.sh',
-                    'destination' => BASE_PATH . '/',
+                    'destination' => BASE_PATH . '/protoc.sh',
                 ],
             ]
         ];
