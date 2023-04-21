@@ -80,6 +80,12 @@ class ConfigProvider
                     'source' => __DIR__ . '/../publish/overwrite/overwrite.php',
                     'destination' => BASE_PATH . '/overwrite/overwrite.php',
                 ],
+                [
+                    'id' => 'protoc-auto-file',
+                    'description' => 'protoc-auto-file',
+                    'source' => __DIR__ . '/../publish/protoc.sh',
+                    'destination' => BASE_PATH . '/',
+                ],
             ]
         ];
     }
