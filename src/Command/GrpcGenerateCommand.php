@@ -21,7 +21,7 @@ class GrpcGenerateCommand extends Command
     {
         parent::configure();
         $this->setDescription('Generate Grpc And Client');
-        $this->addArgument('protobuf', InputArgument::REQUIRED, 'The protobuf file');
+        $this->addArgument('protobuf', InputArgument::IS_ARRAY, 'The protobuf file');
         $this->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'The output dir.');
         $this->addOption('paths', 'i', InputOption::VALUE_OPTIONAL, 'The proto paths.');
         $this->addOption('plugin', 'p', InputOption::VALUE_OPTIONAL, 'The plugin path');
@@ -29,9 +29,9 @@ class GrpcGenerateCommand extends Command
 
     public function handle()
     {
-        $protobuf = $this->input->getArgument('protobuf');
+        $protobuf = implode(",", $this->input->getArgument('protobuf'));
         $output = $this->input->getOption('output') ?: getcwd();
-        $paths = $this->input->getOption('paths') ?: dirname($protobuf);
+        $paths = $this->input->getOption('paths') ?: '../protos/';
         $plugin_path = $this->input->getOption('plugin') ?: "/usr/local/lib/grpc_php_plugin";
 
         $process = new Process([
