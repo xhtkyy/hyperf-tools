@@ -17,6 +17,7 @@ use Xhtkyy\HyperfTools\App\Container;
 use Xhtkyy\HyperfTools\App\ContainerInterface;
 use Xhtkyy\HyperfTools\Casbin\CasbinInterface;
 use Xhtkyy\HyperfTools\Casbin\src\Casbin;
+use Xhtkyy\HyperfTools\Command\GrpcGenerateCommand;
 use Xhtkyy\HyperfTools\Consul\Listener\RegisterConsul4GrpcDriverListener;
 use Xhtkyy\HyperfTools\Consul\Listener\RegisterGrpcServiceListener;
 use Xhtkyy\HyperfTools\Dtm\DtmGrpcApi;
@@ -37,6 +38,7 @@ class ConfigProvider
                 CasbinInterface::class => Casbin::class
             ],
             'commands' => [
+                GrpcGenerateCommand::class
             ],
             'annotations' => [
                 'scan' => [
@@ -80,12 +82,12 @@ class ConfigProvider
                     'source' => __DIR__ . '/../publish/overwrite/overwrite.php',
                     'destination' => BASE_PATH . '/overwrite/overwrite.php',
                 ],
-                [
-                    'id' => 'protoc-auto-file',
-                    'description' => 'protoc-auto-file',
-                    'source' => __DIR__ . '/../publish/protoc.sh',
-                    'destination' => BASE_PATH . '/protoc.sh',
-                ],
+//                [
+//                    'id' => 'protoc-auto-file',
+//                    'description' => 'protoc-auto-file',
+//                    'source' => __DIR__ . '/../publish/protoc.sh',
+//                    'destination' => BASE_PATH . '/protoc.sh',
+//                ],
             ]
         ];
     }
