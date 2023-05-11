@@ -43,7 +43,10 @@ class GrpcClientManager
         $server = $this->service_alias[$server] ?? $server . ".grpc";
 
         //获取配置，兼容调试使用
-        if (!empty($this->service_hostname[$server])) return $this->service_hostname[$server];
+        if (!empty($node = $this->service_hostname[$server])) {
+            [$host, $port] = explode(":", $node);
+            return new Node($host, $port);
+        }
 
         $driverName = $this->config->get("kyy_tools.register.driver_name", "nacos");
         $consulDriverPath = $driverName == "nacos" ? "" : $this->config->get("services.drivers.consul.uri", "consul:8500");
