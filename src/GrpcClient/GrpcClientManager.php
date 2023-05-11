@@ -43,7 +43,7 @@ class GrpcClientManager
         $server = $this->service_alias[$server] ?? $server . ".grpc";
 
         //获取配置，兼容调试使用
-        if (!empty($node = $this->service_hostname[$server])) {
+        if (isset($this->service_hostname[$server]) && !empty($node = $this->service_hostname[$server])) {
             [$host, $port] = explode(":", $node);
             return new Node($host, $port);
         }
