@@ -23,6 +23,7 @@ class GrpcClientManager
     protected LoggerInterface $logger;
     protected string $algo;
     protected array $service_alias = [];
+    protected array $service_hostname = [];
 
 
     public function __construct(protected ContainerInterface $container)
@@ -33,12 +34,16 @@ class GrpcClientManager
         //
         $this->algo = $this->config->get("kyy_tools.register.algo", "round-robin");
         $this->service_alias = $this->config->get("kyy_tools.service_alias", []);
+        $this->config->get("app_env") == "dev" && $this->service_hostname = $this->config->get("hosts", []);
     }
 
     public function getNode(string $server): ?Node
     {
         // service alias
         $server = $this->service_alias[$server] ?? $server . ".grpc";
+
+        //获取配置，兼容调试使用
+        if (!empty($this->service_hostname[$server])) return $this->service_hostname[$server];
 
         $driverName = $this->config->get("kyy_tools.register.driver_name", "nacos");
         $consulDriverPath = $driverName == "nacos" ? "" : $this->config->get("services.drivers.consul.uri", "consul:8500");
