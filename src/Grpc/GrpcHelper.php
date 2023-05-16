@@ -3,13 +3,15 @@
 namespace Xhtkyy\HyperfTools\Grpc;
 
 use Hyperf\HttpServer\Router\Router;
-use PhpCsFixer\ConfigInterface;
 use Xhtkyy\HyperfTools\Grpc\Health\HealthController;
+use Xhtkyy\HyperfTools\Grpc\Middleware\GrpcTraceMiddleware;
 use Xhtkyy\HyperfTools\GrpcReflection\GrpcReflection;
 
-class GrpcHelper {
+class GrpcHelper
+{
     //注册反射
-    public static function RegisterRoutes(callable $callback, string $serverName = "grpc"): void {
+    public static function RegisterRoutes(callable $callback, string $serverName = "grpc"): void
+    {
         Router::addServer($serverName, function () use ($callback) {
             //注册反射
             if (env("REFLECTION_ENABLE", true)) {
@@ -27,7 +29,7 @@ class GrpcHelper {
                 "register" => false
             ]);
             //注册其他
-            $callback();
+            Router::addGroup("", $callback, ["middleware" => [GrpcTraceMiddleware::class]]);
         });
     }
 }
