@@ -18,7 +18,7 @@ return [
     'providers' => [],
     'drivers' => [
         'consul' => [
-            'uri' => env("CONSUL_URI", "consul:8500"),
+            'uri' => \Hyperf\Support\env("CONSUL_URI", "consul:8500"),
             'token' => '',
             'check' => [
                 'deregister_critical_service_after' => '90m',
@@ -27,13 +27,16 @@ return [
         ],
         'nacos' => [
             // nacos server url like https://nacos.hyperf.io, Priority is higher than host:port
-            'uri' => env('NACOS_URI', ''),
+            'uri' => \Hyperf\Support\env('NACOS_URI', ''),
             // The nacos host info
-            'host' => env('NACOS_HOST', 'nacos'),
-            'port' => intval(env('NACOS_PORT', 8848)),
+            'host' => \Hyperf\Support\env('NACOS_HOST', 'nacos'),
+            'port' => intval(\Hyperf\Support\env('NACOS_PORT', 8848)),
             // The nacos account info
-            'username' => env('NACOS_USERNAME', 'nacos'),
-            'password' => env('NACOS_PASSWORD', 'nacos'),
+            'username' => \Hyperf\Support\env('NACOS_USERNAME'),
+            'password' => \Hyperf\Support\env('NACOS_PASSWORD'),
+            // Mes config
+            'access_key' => \Hyperf\Support\env("NACOS_ACCESS_KEY"),
+            'access_secret' => \Hyperf\Support\env("NACOS_ACCESS_SECRET"),
             'guzzle' => [
                 'config' => [
                     'headers' => [
@@ -43,10 +46,10 @@ return [
                     'handler' => \Xhtkyy\HyperfTools\Guzzle\Retry::handler()
                 ],
             ],
-            'group_name' => env('NACOS_GROUP_NAME', 'api'),
-            'namespace_id' => env('NACOS_NAMESPACE'),
+            'group_name' => \Hyperf\Support\env('NACOS_GROUP_NAME', 'api'),
+            'namespace_id' => \Hyperf\Support\env('NACOS_NAMESPACE'),
             'heartbeat' => 5,
-            'ephemeral' => env('NACOS_EPHEMERAL', true),
+            'ephemeral' => \Hyperf\Support\env('NACOS_EPHEMERAL', true),
         ],
     ],
 ];
