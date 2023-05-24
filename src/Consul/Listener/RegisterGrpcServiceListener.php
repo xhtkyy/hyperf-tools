@@ -89,7 +89,7 @@ class RegisterGrpcServiceListener implements ListenerInterface
                             // 兼容nacos不同版本调用 错误抛400问题
                             if ($requestException->getCode() != 400) {
                                 $this->logger->error("[{$requestException->getCode()}] " . $requestException->getMessage());
-                                continue;
+                                break;
                             }
                         }
                         $governance->register($name, $host, $port, ['protocol' => $protocol]);
