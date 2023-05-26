@@ -52,6 +52,9 @@ class ConfigProvider
                         __DIR__,
                     ],
                 ],
+                'class_map' => [
+                    \Google\Protobuf\Internal\DescriptorPool::class => __DIR__ . '/../class_map/DescriptorPool.php'
+                ]
             ],
             'listeners' => [
                 RegisterConsul4GrpcDriverListener::class,

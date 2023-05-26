@@ -18,7 +18,7 @@ return [
     'providers' => [],
     'drivers' => [
         'consul' => [
-            'uri' => \Hyperf\Support\env("CONSUL_URI", "consul:8500"),
+            'uri' => \Hyperf\Support\env('CONSUL_URI', 'consul:8500'),
             'token' => '',
             'check' => [
                 'deregister_critical_service_after' => '90m',
@@ -35,8 +35,8 @@ return [
             'username' => \Hyperf\Support\env('NACOS_USERNAME'),
             'password' => \Hyperf\Support\env('NACOS_PASSWORD'),
             // Mes config
-            'access_key' => \Hyperf\Support\env("NACOS_ACCESS_KEY"),
-            'access_secret' => \Hyperf\Support\env("NACOS_ACCESS_SECRET"),
+            'access_key' => \Hyperf\Support\env('NACOS_ACCESS_KEY'),
+            'access_secret' => \Hyperf\Support\env('NACOS_ACCESS_SECRET'),
             'guzzle' => [
                 'config' => [
                     'headers' => [
@@ -46,7 +46,7 @@ return [
                     'handler' => \Xhtkyy\HyperfTools\Guzzle\Retry::handler()
                 ],
             ],
-            'group_name' => \Hyperf\Support\env('NACOS_GROUP_NAME', 'api'),
+            'group_name' => \Hyperf\Support\env('NACOS_GROUP_NAME', 'DEFAULT_GROUP'),
             'namespace_id' => \Hyperf\Support\env('NACOS_NAMESPACE'),
             'heartbeat' => 5,
             'ephemeral' => \Hyperf\Support\env('NACOS_EPHEMERAL', true),
