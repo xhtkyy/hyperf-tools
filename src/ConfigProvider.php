@@ -51,9 +51,6 @@ class ConfigProvider
                     'paths' => [
                         __DIR__,
                     ],
-                ],
-                'class_map' => [
-                    \Google\Protobuf\Internal\DescriptorPool::class => __DIR__ . '/../class_map/DescriptorPool.php'
                 ]
             ],
             'listeners' => [

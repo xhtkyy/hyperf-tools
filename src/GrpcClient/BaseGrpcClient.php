@@ -56,9 +56,12 @@ class BaseGrpcClient
          */
         list($reply, $status) = $res;
         $resp = $res[2] ?? null;
-        // 异常打印
+        // 异常
         if ($status != StatusCode::OK) {
-            !!$reply && $this->logger->error($reply);
+            //日志
+            $this->logger->error("[grpc]{$this->hostname}  {$method} [status-code]{$status} [error]" . $reply ?? '');
+            //转变
+            $reply = new GrpcErrorReply($reply);
         }
         // 判断是否需要追踪
         if ($trace_enable && $this->is_tracer) {

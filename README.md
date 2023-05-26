@@ -8,6 +8,33 @@ composer require xhtkyy/hyperf-tools
 
 php bin/hyperf.php vendor:publish xhtkyy/hyperf-tools
 
+## 更新
+
+### 20230536
+
+- 移除overwrite 增加class_map覆盖代码，只需要配置 annotations 增加如下
+
+```php
+return [
+    'scan' => [
+        ...
+        'class_map' => [
+            //需要反射增加
+            \Google\Protobuf\Internal\DescriptorPool::class => BASE_PATH.'/vendor/xhtkyy/hyperf-tools/class_map/protobuf/DescriptorPool.php',
+            //需要nacos支持阿里nacos的需要增加
+            \Hyperf\Nacos\AbstractProvider::class => BASE_PATH.'/vendor/xhtkyy/hyperf-tools/class_map/nacos/AbstractProvider.php',
+        ]
+    ],
+];
+```
+
+- 增加支持错误响应携带状态码
+  需要注意 这里将错误返回的字符串变成对象 可以加(string)$reply 转字符串
+```php
+//使用
+\Xhtkyy\HyperfTools\Grpc\Exception\GrpcError::throw("错误信息", -1);
+```
+
 ## 基础
 
 ### 容器
@@ -74,6 +101,7 @@ php bin/hyperf.php vendor:publish xhtkyy/hyperf-tools
 ### 服务注册/发现
 
 #### 1、发布配置
+
 ```
 php bin/hyperf.php vendor:publish hyperf/service-governance
 php bin/hyperf.php vendor:publish xhtkyy/hyperf-tools
