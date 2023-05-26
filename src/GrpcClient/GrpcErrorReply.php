@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Xhtkyy\HyperfTools\GrpcClient;
 
+use function _PHPStan_a3459023a\RingCentral\Psr7\str;
+
 class GrpcErrorReply
 {
     protected int $errCode = -1; //业务码
@@ -15,7 +17,9 @@ class GrpcErrorReply
     public function __construct(?string $reply)
     {
         if ($reply) {
-            [$this->errCode, $this->errMsg] = str_contains($reply, "#") ? explode("#", $reply) : [-1, $reply];
+            [$errCode, $errMsg] = str_contains($reply, "#") ? explode("#", $reply) : [-1, $reply];
+            $this->errCode = intval($errCode);
+            $this->errMsg = (string)$errMsg;
         }
     }
 
