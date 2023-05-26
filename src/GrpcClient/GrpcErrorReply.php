@@ -9,8 +9,8 @@ namespace Xhtkyy\HyperfTools\GrpcClient;
 
 class GrpcErrorReply
 {
-    public int $errCode = -1; //业务码
-    public string $errMsg = "fail";  //错误信息
+    protected int $errCode = -1; //业务码
+    protected string $errMsg = "fail";  //错误信息
 
     public function __construct(?string $reply)
     {
@@ -18,6 +18,17 @@ class GrpcErrorReply
             [$this->errCode, $this->errMsg] = str_contains($reply, "#") ? explode("#", $reply) : [-1, $reply];
         }
     }
+
+    public function getCode(): int
+    {
+        return $this->errCode;
+    }
+
+    public function getMessage(): string
+    {
+        return $this->errMsg;
+    }
+
 
     public function __toString(): string
     {
