@@ -101,7 +101,7 @@ if (!function_exists("check_param_and_call")) {
 
 
 if (!function_exists("check_db_connect")) {
-    function check_db_connect($max = 3, $pool = "default"): void
+    function check_db_connect($max = 5, $pool = "default"): void
     {
         $tryTimes = 0;
         $output = new \Symfony\Component\Console\Output\ConsoleOutput();
