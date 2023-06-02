@@ -8,13 +8,14 @@ declare(strict_types=1);
 namespace Xhtkyy\HyperfTools\Grpc\Health;
 
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Xhtkyy\HyperfTools\Grpc\Exception\StreamException;
 use Xhtkyy\HyperfTools\Grpc\Health\HealthCheckResponse\ServingStatus;
 use Xhtkyy\HyperfTools\Grpc\Server\Response\Stream;
 
 class HealthController implements HealthInterface
 {
-    public function __construct(protected ConfigInterface $config)
+    public function __construct(protected ConfigInterface $config, protected StdoutLoggerInterface $stdoutLogger)
     {
     }
 
@@ -40,7 +41,10 @@ class HealthController implements HealthInterface
                 sleep($wait);
             }
             $stream->close();
+            //调试打印
+            $this->stdoutLogger->debug("grpc watcher close");
         } catch (StreamException $exception) {
+            $this->stdoutLogger->error("create stream fail: " . $exception->getMessage());
             // 兼容非Streaming模式
         }
         return $response;

@@ -55,7 +55,7 @@ class Stream
          */
         $container = ApplicationContext::getContainer();
         try {
-            $this->server = $container->get(Server::class);
+            $this->server = $container->get(\Swoole\Server::class);
             // Get swoole request and response
             $this->request = $request ?? Context::get(Request::class);
             $this->response = $response ?? Context::get(Response::class);

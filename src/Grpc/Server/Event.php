@@ -9,7 +9,7 @@ namespace Xhtkyy\HyperfTools\Grpc\Server;
 
 use Hyperf\Context\ApplicationContext;
 use Hyperf\Contract\ContainerInterface;
-use Swoole\Http\Server;
+use Swoole\Server;
 
 class Event
 {
