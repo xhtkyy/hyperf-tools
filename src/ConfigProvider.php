@@ -75,25 +75,7 @@ class ConfigProvider
                     'description' => 'The config for services.',
                     'source' => __DIR__ . '/../publish/services.php',
                     'destination' => BASE_PATH . '/config/autoload/services.php',
-                ],
-                [
-                    'id' => 'overwrite-class-DescriptorPool',
-                    'description' => 'overwrite file',
-                    'source' => __DIR__ . '/../publish/overwrite/src/DescriptorPool.php',
-                    'destination' => BASE_PATH . '/overwrite/src/DescriptorPool.php',
-                ],
-                [
-                    'id' => 'overwrite-file',
-                    'description' => 'overwrite file',
-                    'source' => __DIR__ . '/../publish/overwrite/overwrite.php',
-                    'destination' => BASE_PATH . '/overwrite/overwrite.php',
-                ],
-//                [
-//                    'id' => 'protoc-auto-file',
-//                    'description' => 'protoc-auto-file',
-//                    'source' => __DIR__ . '/../publish/protoc.sh',
-//                    'destination' => BASE_PATH . '/protoc.sh',
-//                ],
+                ]
             ]
         ];
     }

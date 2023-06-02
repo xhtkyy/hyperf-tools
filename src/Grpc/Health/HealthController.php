@@ -42,9 +42,9 @@ class HealthController implements HealthInterface
             }
             $stream->close();
             //调试打印
-            $this->stdoutLogger->debug("grpc watcher close");
+            $this->stdoutLogger->debug("Grpc watcher close");
         } catch (StreamException $exception) {
-            $this->stdoutLogger->error("create stream fail: " . $exception->getMessage());
+            $this->stdoutLogger->error("Create stream fail: " . $exception->getMessage());
             // 兼容非Streaming模式
         }
         return $response;
