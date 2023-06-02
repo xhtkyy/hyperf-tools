@@ -10,6 +10,7 @@ use Hyperf\GrpcServer\Exception\GrpcException;
 use Hyperf\HttpServer\Router\DispatcherFactory;
 use Hyperf\HttpServer\Router\Handler;
 use Xhtkyy\HyperfTools\App\ContainerInterface;
+use Xhtkyy\HyperfTools\Grpc\Health\Health;
 use Xhtkyy\HyperfTools\GrpcReflection\ServerReflection\FileDescriptorResponse;
 use Xhtkyy\HyperfTools\GrpcReflection\ServerReflection\ListServiceResponse;
 use Xhtkyy\HyperfTools\GrpcReflection\ServerReflection\ServerReflectionInterface;
@@ -46,6 +47,9 @@ class GrpcReflection implements ServerReflectionInterface
         foreach ($class as $item => $reflection) {
             call_user_func("{$item}::initOnce");
         }
+
+        //Add grpc health
+        Health::initOnce();
 
         //获取服务
         $this->servers = $this->servers();

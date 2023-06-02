@@ -7,10 +7,16 @@ declare(strict_types=1);
 
 namespace Xhtkyy\HyperfTools\Grpc\Health;
 
+use Hyperf\Contract\ConfigInterface;
+use Xhtkyy\HyperfTools\Grpc\Exception\StreamException;
 use Xhtkyy\HyperfTools\Grpc\Health\HealthCheckResponse\ServingStatus;
+use Xhtkyy\HyperfTools\Grpc\Server\Response\Stream;
 
 class HealthController implements HealthInterface
 {
+    public function __construct(protected ConfigInterface $config)
+    {
+    }
 
     public function check(HealthCheckRequest $request): HealthCheckResponse
     {
@@ -23,6 +29,20 @@ class HealthController implements HealthInterface
     {
         $response = new HealthCheckResponse();
         $response->setStatus(ServingStatus::SERVING);
+
+        $wait = $this->config->get("kyy_tools.health.wait", 300);
+        try {
+            $stream = new Stream();
+            while (true) {
+                if (!$stream->write($response)) {
+                    break;
+                };
+                sleep($wait);
+            }
+            $stream->close();
+        } catch (StreamException $exception) {
+            // 兼容非Streaming模式
+        }
         return $response;
     }
 

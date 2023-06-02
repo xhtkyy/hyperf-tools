@@ -10,6 +10,22 @@ php bin/hyperf.php vendor:publish xhtkyy/hyperf-tools
 
 ## 更新
 
+### 20230602
+
+- 增加服务支持Streaming模式
+可参照健康检查watch方法的使用
+```php
+$stream = new Stream();
+//支持流式 多次写入
+$stream->write($response)
+$stream->write($response)
+$stream->write($response)
+...
+// 记得关闭，不然还继续走 普通响应
+$stream->close();
+```
+- Grpc Health Watch 增加 Streaming 支持
+
 ### 20230536
 
 - 移除overwrite 增加class_map覆盖代码，只需要配置 annotations 增加如下
