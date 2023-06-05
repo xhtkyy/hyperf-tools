@@ -13,10 +13,12 @@ use Hyperf\Context\ApplicationContext;
 use Hyperf\Context\Context;
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Grpc\Parser;
+use Hyperf\Grpc\StatusCode;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server;
 use Xhtkyy\HyperfTools\Grpc\Exception\StreamException;
+use function Hyperf\Stringable\str;
 
 /**
  * Grpc Streaming
@@ -43,7 +45,7 @@ class Stream
     const SW_HTTP2_FRAME_TYPE_DATA = 0x00;
     const SW_HTTP2_FLAG_NONE = 0x00;
     const SW_HTTP2_FLAG_ACK = 0x01;
-    const SW_HTTP2_FLAG_END_STREAM = 0x01;
+    const SW_HTTP2_FLAG_END_STREAM = 0x1;
     const SW_HTTP2_FLAG_END_HEADERS = 0x04;
     const SW_HTTP2_FLAG_PADDED = 0x08;
     const SW_HTTP2_FLAG_PRIORITY = 0x20;
@@ -71,7 +73,7 @@ class Stream
      * @param bool $end
      * @return bool
      */
-    public function write(mixed $data, bool $end = false): bool
+    public function write(mixed $data): bool
     {
         if (!$this->withHeader && !$this->withHeader()) {
             return false;
@@ -84,20 +86,23 @@ class Stream
         $res = $this->server->send($this->response->fd, $this->frame(
             $data ? Parser::serializeMessage($data) : '',
             self::SW_HTTP2_FRAME_TYPE_DATA,
-            $end ? self::SW_HTTP2_FLAG_END_STREAM : self::SW_HTTP2_FLAG_NONE,
+            self::SW_HTTP2_FLAG_NONE,
             $this->request->streamId
         ));
-
-        if ($end) {
-            $this->response->detach();
-        }
 
         return $res;
     }
 
-    public function close(): bool
+    public function close($status = StatusCode::OK, string $message = ''): bool
     {
-        return $this->write(null, true);
+        $res = $this->withHeader(true, [
+            ['grpc-status', (string)$status],
+            ['grpc-message', $message],
+        ]);
+
+        $this->response->detach();
+
+        return $res;
     }
 
 
@@ -107,16 +112,14 @@ class Stream
     }
 
     /**
+     * @param bool $end
      * @param array $headers
      * @return bool
      */
-    public function withHeader(array $headers = [
+    public function withHeader(bool $end = false, array $headers = [
         [':status', '200'],
-        ['server', 'Hyperf'],
         ['content-type', 'application/grpc'],
-        ['trailer', 'grpc-status, grpc-message'],
-        ['grpc-status', '0'],
-        ['grpc-message', ''],
+        ['trailer', 'grpc-status, grpc-message']
     ]): bool
     {
         try {
@@ -127,7 +130,7 @@ class Stream
         $res = $this->server->send($this->response->fd, $this->frame(
             $compressedHeaders,
             self::SW_HTTP2_FRAME_TYPE_HEAD,
-            self::SW_HTTP2_FLAG_END_HEADERS,
+            $end ? (self::SW_HTTP2_FLAG_END_STREAM | self::SW_HTTP2_FLAG_END_HEADERS) : self::SW_HTTP2_FLAG_END_HEADERS,
             $this->request->streamId
         ));
         $this->withHeader = $res;
