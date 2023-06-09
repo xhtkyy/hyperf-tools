@@ -69,7 +69,7 @@ class Stream
             if( !$connect ) {
                 throw new \Exception('undefined response');
             }
-
+            $this->response = $connect->getSocket();
         } catch (\Throwable $e) {
             throw new StreamException($e->getMessage());
         }
