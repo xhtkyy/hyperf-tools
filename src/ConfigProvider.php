@@ -24,6 +24,7 @@ use Xhtkyy\HyperfTools\Consul\Listener\RegisterConsul4GrpcDriverListener;
 use Xhtkyy\HyperfTools\Consul\Listener\RegisterGrpcServiceListener;
 use Xhtkyy\HyperfTools\Dtm\DtmGrpcApi;
 use Xhtkyy\HyperfTools\Dtm\GrpcClientManagerFactory;
+use Xhtkyy\HyperfTools\Grpc\Server\ServerStartListener;
 use Xhtkyy\HyperfTools\GrpcClient\GrpcClientManager;
 use Xhtkyy\HyperfTools\Listener\AutoInitGPBMetadataListener;
 use Xhtkyy\HyperfTools\Nacos\ApplicationFactory;
@@ -40,8 +41,6 @@ class ConfigProvider
                 //接管容器
                 ContainerInterface::class => Container::class,
                 CasbinInterface::class => Casbin::class,
-                //nacos
-                Application::class => ApplicationFactory::class
             ],
             'commands' => [
                 GrpcGenerateCommand::class
@@ -56,6 +55,7 @@ class ConfigProvider
             'listeners' => [
                 RegisterConsul4GrpcDriverListener::class,
                 RegisterGrpcServiceListener::class,
+                ServerStartListener::class
             ],
             'publish' => [
                 [
