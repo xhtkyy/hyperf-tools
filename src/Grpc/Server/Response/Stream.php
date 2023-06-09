@@ -18,7 +18,9 @@ use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server;
 use Xhtkyy\HyperfTools\Grpc\Exception\StreamException;
-use function Hyperf\Stringable\str;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Hyperf\Engine\Http\WritableConnection;
 
 /**
  * Grpc Streaming
@@ -59,8 +61,14 @@ class Stream
         try {
             $this->server = $container->get(\Swoole\Server::class);
             // Get swoole request and response
-            $this->request = $request ?? Context::get(Request::class);
-            $this->response = $response ?? Context::get(Response::class);
+            $this->request = Context::get(ServerRequestInterface::class)->getSwooleRequest();
+            /**
+             * @var WritableConnection $connect
+             */
+            $connect = Context::get(ResponseInterface::class)->getConnection();
+            if( !$connect ) {
+                throw new \Exception('undefined response');
+            }
 
         } catch (\Throwable $e) {
             throw new StreamException($e->getMessage());
