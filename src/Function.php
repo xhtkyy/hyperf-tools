@@ -44,6 +44,9 @@ if (!function_exists('message_to_array')) {
             if ($value instanceof \Google\Protobuf\Internal\RepeatedField) {
                 // repeated
                 $array[$property->getName()] = repeated_field_to_array($value);
+            } elseif ($value instanceof Struct) {
+                // struct
+                $array[$property->getName()] = struct_to_array($value);
             } elseif ($value instanceof Message) {
                 // message
                 $array[$property->getName()] = message_to_array($value);
