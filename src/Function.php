@@ -72,10 +72,11 @@ if (!function_exists('array_to_struct')) {
 }
 
 if (!function_exists("repeated_field_to_array")) {
-    function repeated_field_to_array(\Google\Protobuf\Internal\RepeatedField $repeatedField): array
+    function repeated_field_to_array(\Google\Protobuf\Internal\RepeatedField $repeatedField, array|string|null $fields = null): array
     {
-        return map(iterator_to_array($repeatedField), function (Message|Struct $item) {
-            return struct_to_array($item);
+        $fields && !is_array($fields) && $fields = explode(',', $fields);
+        return map(iterator_to_array($repeatedField), function (Message|Struct $item) use ($fields) {
+            return !$fields ? struct_to_array($item) : array_intersect_key(struct_to_array($item), array_flip($fields));
         });
     }
 }
