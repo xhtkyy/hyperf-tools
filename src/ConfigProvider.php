@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Xhtkyy\HyperfTools;
 
 use DtmClient\Api\GrpcApi;
-use Hyperf\Nacos\Application;
 use Hyperf\ServiceGovernanceNacos\Client;
 use Xhtkyy\HyperfTools\App\Container;
 use Xhtkyy\HyperfTools\App\ContainerInterface;
@@ -26,8 +25,6 @@ use Xhtkyy\HyperfTools\Dtm\DtmGrpcApi;
 use Xhtkyy\HyperfTools\Dtm\GrpcClientManagerFactory;
 use Xhtkyy\HyperfTools\Grpc\Server\ServerStartListener;
 use Xhtkyy\HyperfTools\GrpcClient\GrpcClientManager;
-use Xhtkyy\HyperfTools\Listener\AutoInitGPBMetadataListener;
-use Xhtkyy\HyperfTools\Nacos\ApplicationFactory;
 use Xhtkyy\HyperfTools\Nacos\ClientFactory;
 
 class ConfigProvider
@@ -41,6 +38,8 @@ class ConfigProvider
                 //接管容器
                 ContainerInterface::class => Container::class,
                 CasbinInterface::class => Casbin::class,
+                //接管 nacos client
+                Client::class => ClientFactory::class
             ],
             'commands' => [
                 GrpcGenerateCommand::class
