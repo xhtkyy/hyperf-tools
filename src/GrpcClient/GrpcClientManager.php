@@ -93,6 +93,7 @@ class GrpcClientManager
             //丢进池子复用
             $this->pools[$hostname] = new GrpcClient($hostname, [
                 'credentials' => $this->credentials,
+                'timeout' => 8.0
             ]);
         }
         return $this->pools[$hostname];
