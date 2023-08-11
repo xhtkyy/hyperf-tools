@@ -43,12 +43,12 @@ class DescriptorPool
     private static $pool;
     // Map from message names to sub-maps, which are maps from field numbers to
     // field descriptors.
-    private $class_to_desc = [];
-    private $class_to_enum_desc = [];
-    private $proto_to_class = [];
+    private array $class_to_desc = [];
+    private array $class_to_enum_desc = [];
+    private array $proto_to_class = [];
     // 内容存储
-    private $proto_to_content = [];
-    private $class_to_proto = [];
+    private array $proto_to_content = [];
+    private array $class_to_proto = [];
 
     public static function getGeneratedPool()
     {
@@ -58,7 +58,7 @@ class DescriptorPool
         return self::$pool;
     }
 
-    public function internalAddGeneratedFile($data, $use_nested = false)
+    public function internalAddGeneratedFile($data, $use_nested = false): void
     {
         $files = new FileDescriptorSet();
         $files->mergeFromString($data);
@@ -68,7 +68,7 @@ class DescriptorPool
          */
         foreach ($files->getFile() as $file_proto) {
 
-            $this->addContent($file_proto, $data);
+            $this->addContent($file_proto);
 
             $file = FileDescriptor::buildFromProto($file_proto);
             foreach ($file->getMessageType() as $desc) {
@@ -214,16 +214,15 @@ class DescriptorPool
         return $this->proto_to_content[$proto] ?? "";
     }
 
-    public function addContent(FileDescriptorProto $file_proto, string $content): void
+    public function addContent(FileDescriptorProto $file_proto): void
     {
-        $content = str_replace('\\\\', "\\", $content);
-        $content = str_replace(substr($content, 1, 3), "", $content);
-        !isset($this->proto_to_content[$file_proto->getName()]) && $this->proto_to_content[$file_proto->getName()] = $content;
         /**
          * @var ServiceDescriptorProto $item
          */
         foreach ($file_proto->getService() as $item) {
             $this->class_to_proto["{$file_proto->getPackage()}.{$item->getName()}"] = $file_proto->getName();
         }
+        // add content
+        !isset($this->proto_to_content[$file_proto->getName()]) && $this->proto_to_content[$file_proto->getName()] = $file_proto->serializeToString();
     }
 }
