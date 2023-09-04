@@ -14,22 +14,46 @@ use Xhtkyy\HyperfTools\App\Exception\InvalidArgumentException;
  */
 abstract class CURDRepo {
     protected string $model;
+    /**
+     * @deprecated
+     */
     protected array $where = [];
+    /**
+     * @deprecated
+     */
     protected array $betweenWhere = [];
+    /**
+     * @deprecated
+     */
     protected array $params = [];
+    /**
+     * @deprecated
+     */
     protected array $select = [];
+    /**
+     * @deprecated
+     */
     protected array $with = [];
 
+    /**
+     * @deprecated
+     */
     public function params($params = null): static {
         $this->params = $params ?? (empty($this->params) ? di(RequestInterface::class)->all() : $this->params);
         return $this;
     }
 
+    /**
+     * @deprecated
+     */
     public function select(string|array $selects): static {
         $this->select = is_array($selects) ? $selects : explode(",", $selects);
         return $this;
     }
 
+    /**
+     * @deprecated
+     */
     public function with(array $with): static {
         $this->with = $with;
         return $this;
@@ -39,11 +63,17 @@ abstract class CURDRepo {
         return (new $this->model)->newQuery();
     }
 
+    /**
+     * @deprecated
+     */
     public function where(...$args): static {
         $this->where[] = func_get_args();
         return $this;
     }
 
+    /**
+     * @deprecated
+     */
     public function eqWhere(string|array $fields, string $symbol = "="): static {
         $this->params();
         $fields = is_string($fields) ? explode(",", $fields) : $fields;
@@ -55,6 +85,9 @@ abstract class CURDRepo {
         return $this;
     }
 
+    /**
+     * @deprecated
+     */
     public function likeWhere(string|array $fields, string $type = "all"): static {
         $this->params();
         $fields = is_string($fields) ? explode(",", $fields) : $fields;
@@ -70,6 +103,9 @@ abstract class CURDRepo {
         return $this;
     }
 
+    /**
+     * @deprecated
+     */
     public function betweenWhere(string|array $fields): static {
         $this->params();
         $fields = is_string($fields) ? explode(",", $fields) : $fields;
