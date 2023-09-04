@@ -9,6 +9,9 @@ use Xhtkyy\HyperfTools\App\Exception\AppException;
 use Xhtkyy\HyperfTools\App\Exception\NotFoundException;
 use Xhtkyy\HyperfTools\App\Exception\InvalidArgumentException;
 
+/**
+ * @deprecated
+ */
 abstract class CURDRepo {
     protected string $model;
     protected array $where = [];
