@@ -20,6 +20,7 @@ class DingTalk implements BotMessageInterface
     private string $pipeline = 'default';
     private array $body = [];
     private array $config = [];
+    private array $at = [];
 
     public function __construct(protected ConfigInterface $conf)
     {
@@ -99,6 +100,13 @@ class DingTalk implements BotMessageInterface
         if (empty($this->body)) return false;
         if ($this->debug && strtolower($this->conf->get('app_env', '')) != 'dev') return false;
 
+        if (!empty($this->at)) {
+            $this->body['at'] = [
+                'isAtAll' => in_array('all', $this->at),
+                'atMobiles' => $this->at
+            ];
+        }
+
         $client = new Client(['base_uri' => 'https://oapi.dingtalk.com']);
         try {
             $client->post('/robot/send?' . $this->getSignQuery(), [RequestOptions::JSON => $this->body]);
@@ -120,5 +128,11 @@ class DingTalk implements BotMessageInterface
         $timestamp = intval(microtime(true) * 1000);
         $sign = urlencode(base64_encode(hash_hmac('sha256', $timestamp . "\n" . $secret, $secret, true)));
         return http_build_query(compact("access_token", "timestamp", "sign"));
+    }
+
+    public function at(array $at): static
+    {
+        $this->at = $at;
+        return $this;
     }
 }
