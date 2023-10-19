@@ -74,6 +74,12 @@ class ConfigProvider
                     'description' => 'The config for services.',
                     'source' => __DIR__ . '/../publish/services.php',
                     'destination' => BASE_PATH . '/config/autoload/services.php',
+                ],
+                [
+                    'id' => 'config4',
+                    'description' => 'The config for bot notice.',
+                    'source' => __DIR__ . '/../publish/bot_notice.php',
+                    'destination' => BASE_PATH . '/config/autoload/bot_notice.php',
                 ]
             ]
         ];
