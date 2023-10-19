@@ -16,6 +16,7 @@ use Xhtkyy\HyperfTools\BotMessage\BotMessageInterface;
 
 class DingTalk implements BotMessageInterface
 {
+    private bool $debug = false;
     private string $pipeline = 'default';
     private array $body = [];
     private array $config = [];
@@ -48,15 +49,56 @@ class DingTalk implements BotMessageInterface
         return $this;
     }
 
+    private function decodeContent(mixed $content): string
+    {
+        return match (true) {
+            is_string($content) => $content,
+            is_array($content), is_object($content) => '``` ' . json_encode($content, JSON_UNESCAPED_UNICODE) . ' ```',
+            default => (string)$content
+        };
+    }
+
+    public function info(string $title, mixed $content)
+    {
+        $this->body = [
+            'msgtype' => 'markdown',
+            'markdown' => [
+                'title' => $title,
+                'text' => '### ' . $title . " \n --- \n " . $this->decodeContent($content),
+            ]
+        ];
+        return $this;
+    }
+
+    public function error(string $title, mixed $content)
+    {
+        $this->body = [
+            'msgtype' => 'markdown',
+            'markdown' => [
+                'title' => $title,
+                'text' => "### " . "<font color=red>{$title}</font>" . " \n --- \n " . $this->decodeContent($content),
+            ]
+        ];
+        return $this;
+    }
+
     public function pipeline(string $pipeline): static
     {
         $this->pipeline = $pipeline;
         return $this;
     }
 
+    public function debug()
+    {
+        $this->debug = true;
+        return $this;
+    }
+
     public function notice(): bool
     {
         if (empty($this->body)) return false;
+        if ($this->debug && strtolower($this->conf->get('app_env', '')) != 'dev') return false;
+
         $client = new Client(['base_uri' => 'https://oapi.dingtalk.com']);
         try {
             $client->post('/robot/send?' . $this->getSignQuery(), [RequestOptions::JSON => $this->body]);
