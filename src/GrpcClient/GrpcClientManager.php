@@ -24,6 +24,7 @@ class GrpcClientManager
     protected string $algo;
     protected array $service_alias = [];
     protected array $service_hostname = [];
+    private array $server_proxy = [];
 
 
     public function __construct(protected ContainerInterface $container)
@@ -122,14 +123,25 @@ class GrpcClientManager
             if (empty($hostname)) {
                 $node = null;
                 //根据/分割 获取服务名称
-                $server = explode('.', current(explode("/", trim($method, '/'))));
-                //增加支持多级服务
-                for ($i = count($server); $i > 0; $i--) {
-                    if (isset($server[$i])) unset($server[$i]);
-                    //获取节点地址
-                    $node = $this->getNode(implode('.', $server));
-                    if ($node) break;
+                $server = current(explode("/", trim($method, '/')));
+                if (!isset($this->server_proxy[$server])) {
+                    $tmp = explode('.',);
+                    //增加支持多级服务
+                    for ($i = count($tmp); $i > 0; $i--) {
+                        if (isset($tmp[$i])) unset($tmp[$i]);
+                        $tmpName = implode('.', $tmp);
+                        //获取节点地址
+                        $node = $this->getNode($tmpName);
+                        if ($node) {
+                            //存在就 更新进代理
+                            $this->server_proxy[$server] = $tmpName;
+                            break;
+                        }
+                    }
+                } else {
+                    $node = $this->getNode($this->server_proxy[$server]);
                 }
+
                 if (!$node) return ["无服务节点,请检查服务注册", StatusCode::ABORTED];
                 $hostname = sprintf("%s:%d", $node->host, $node->port);
             }
