@@ -116,10 +116,16 @@ class GrpcClientManager
         //响应
         try {
             if (empty($hostname)) {
-                //获取服务名称
-                $server = trim(current(explode(".", $method)), "/");
-                //获取节点地址
-                $node = $this->getNode($server);
+                $node = null;
+                //根据/分割 获取服务名称
+                $server = explode('.', trim(current(explode("/", $method)), "/"));
+                //增加支持多级服务
+                for ($i = count($server); $i > 0; $i--) {
+                    if (isset($server[$i])) unset($server[$i]);
+                    //获取节点地址
+                    $node = $this->getNode(implode('.', $server));
+                    if ($node) break;
+                }
                 if (!$node) return ["无服务节点", StatusCode::ABORTED];
                 $hostname = sprintf("%s:%d", $node->host, $node->port);
             }
