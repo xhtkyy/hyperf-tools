@@ -125,7 +125,7 @@ class GrpcClientManager
                 //根据/分割 获取服务名称
                 $server = current(explode("/", trim($method, '/')));
                 if (!isset($this->server_proxy[$server])) {
-                    $tmp = explode('.',);
+                    $tmp = explode('.', $server);
                     //增加支持多级服务
                     for ($i = count($tmp); $i > 0; $i--) {
                         if (isset($tmp[$i])) unset($tmp[$i]);
