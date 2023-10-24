@@ -65,12 +65,16 @@ class GrpcClientManager
                         }
                         return $nodes;
                     };
+                    $noes = $fun();
                     //设置滚动刷新 异步
-                    $serverLB->setNodes($fun())->refresh($fun);
+                    $serverLB->setNodes($fun());
+                    //服务有注册过的 才去刷新 减少进程消耗
+                    if (!empty($noes)) $serverLB->refresh($fun);
                 }
                 return $serverLB->select();
             } catch (\Throwable $throwable) {
-                $this->logger->error(sprintf("服务 %s 在 %s 获取失败 策略：%s 原因：%s", $server, $driverName, $this->algo, $throwable->getMessage()));
+                //这里就不打印了，加上支持多级服务 会造成很多打印
+//                $this->logger->error(sprintf("服务 %s 在 %s 获取失败 策略：%s 原因：%s", $server, $driverName, $this->algo, $throwable->getMessage()));
             }
         }
         return null;
@@ -118,7 +122,7 @@ class GrpcClientManager
             if (empty($hostname)) {
                 $node = null;
                 //根据/分割 获取服务名称
-                $server = explode('.', trim(current(explode("/", $method)), "/"));
+                $server = explode('.', current(explode("/", trim($method, '/'))));
                 //增加支持多级服务
                 for ($i = count($server); $i > 0; $i--) {
                     if (isset($server[$i])) unset($server[$i]);
@@ -126,7 +130,7 @@ class GrpcClientManager
                     $node = $this->getNode(implode('.', $server));
                     if ($node) break;
                 }
-                if (!$node) return ["无服务节点", StatusCode::ABORTED];
+                if (!$node) return ["无服务节点,请检查服务注册", StatusCode::ABORTED];
                 $hostname = sprintf("%s:%d", $node->host, $node->port);
             }
             return $this->getClient($hostname, $method)->invoke($method, $argument, $deserialize, $metadata, $options);
