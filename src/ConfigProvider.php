@@ -12,20 +12,10 @@ declare(strict_types=1);
 
 namespace Xhtkyy\HyperfTools;
 
-use DtmClient\Api\GrpcApi;
-use Hyperf\ServiceGovernanceNacos\Client;
 use Xhtkyy\HyperfTools\App\Container;
 use Xhtkyy\HyperfTools\App\ContainerInterface;
-use Xhtkyy\HyperfTools\Casbin\CasbinInterface;
-use Xhtkyy\HyperfTools\Casbin\src\Casbin;
-use Xhtkyy\HyperfTools\Command\GrpcGenerateCommand;
-use Xhtkyy\HyperfTools\Consul\Listener\RegisterConsul4GrpcDriverListener;
-use Xhtkyy\HyperfTools\Consul\Listener\RegisterGrpcServiceListener;
-use Xhtkyy\HyperfTools\Dtm\DtmGrpcApi;
-use Xhtkyy\HyperfTools\Dtm\GrpcClientManagerFactory;
+use Xhtkyy\HyperfTools\Grpc\RegisterGrpcServiceListener;
 use Xhtkyy\HyperfTools\Grpc\Server\ServerStartListener;
-use Xhtkyy\HyperfTools\GrpcClient\GrpcClientManager;
-use Xhtkyy\HyperfTools\Nacos\ClientFactory;
 
 class ConfigProvider
 {
@@ -33,16 +23,10 @@ class ConfigProvider
     {
         return [
             'dependencies' => [
-                GrpcClientManager::class => GrpcClientManagerFactory::class,
-                GrpcApi::class => DtmGrpcApi::class,
                 //接管容器
                 ContainerInterface::class => Container::class,
-                CasbinInterface::class => Casbin::class,
-                //接管 nacos client
-                Client::class => ClientFactory::class
             ],
             'commands' => [
-                GrpcGenerateCommand::class
             ],
             'annotations' => [
                 'scan' => [
@@ -52,7 +36,6 @@ class ConfigProvider
                 ]
             ],
             'listeners' => [
-                RegisterConsul4GrpcDriverListener::class,
                 RegisterGrpcServiceListener::class,
                 ServerStartListener::class
             ],

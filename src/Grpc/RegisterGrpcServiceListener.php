@@ -1,6 +1,6 @@
 <?php
 
-namespace Xhtkyy\HyperfTools\Consul\Listener;
+namespace Xhtkyy\HyperfTools\Grpc;
 
 use Hyperf\Consul\Exception\ServerException;
 use Hyperf\Contract\ConfigInterface;
@@ -15,6 +15,7 @@ use Hyperf\ServiceGovernance\DriverManager;
 use Hyperf\ServiceGovernance\ServiceManager;
 use Psr\Log\LoggerInterface;
 use Xhtkyy\HyperfTools\App\ContainerInterface;
+use function Xhtkyy\HyperfTools\Consul\Listener\str_contains;
 
 class RegisterGrpcServiceListener implements ListenerInterface
 {

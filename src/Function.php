@@ -2,7 +2,6 @@
 
 use Google\Protobuf\Internal\Message;
 use Google\Protobuf\Struct;
-use Hyperf\Utils\ApplicationContext;
 use function Swoole\Coroutine\map;
 
 if (!function_exists('toArray')) {
@@ -19,7 +18,7 @@ if (!function_exists('toArray')) {
 if (!function_exists('di')) {
     function di(string $id)
     {
-        return ApplicationContext::getContainer()->get($id);
+        return \Hyperf\Context\ApplicationContext::getContainer()->get($id);
     }
 }
 

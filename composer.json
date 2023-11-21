@@ -23,7 +23,6 @@
     "require": {
         "php": ">=8.0",
         "amphp/hpack": "^3.1",
-        "dtm/dtm-client": "^0.3.2",
         "hyperf/command": "^3.0",
         "hyperf/db-connection": "~3.0.0",
         "hyperf/di": "3.0.*",
@@ -35,10 +34,9 @@
         "hyperf/load-balancer": "~3.0.0",
         "hyperf/rpc-server": "~3.0.0",
         "hyperf/service-governance": "~3.0.0",
-        "hyperf/service-governance-consul": "~3.0.0",
-        "hyperf/service-governance-nacos": "~3.0.0",
         "hyperf/tracer": "~3.0.0",
-        "jonahgeorge/jaeger-client-php": "^1.4"
+        "jonahgeorge/jaeger-client-php": "^1.4",
+        "crayxn/service-governance-nacos-grpc": "dev-main"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
@@ -59,13 +57,7 @@
     "scripts": {
         "test": "phpunit -c phpunit.xml --colors=always",
         "analyse": "phpstan analyse --memory-limit 1024M -l 0 ./src",
-        "cs-fix": "php-cs-fixer fix $1",
-        "post-install-cmd": [
-            "chmod +x ./bin/grpc-generator"
-        ],
-        "post-update-cmd": [
-            "chmod +x ./bin/grpc-generator"
-        ]
+        "cs-fix": "php-cs-fixer fix $1"
     },
     "extra": {
         "hyperf": {
