@@ -106,6 +106,11 @@ if (!function_exists("check_param_and_call")) {
 if (!function_exists("check_db_connect")) {
     function check_db_connect($max = 5, $pool = "default"): void
     {
+        // 非启动程序 就不检查连接
+        if ((new \Symfony\Component\Console\Input\ArgvInput())->getFirstArgument() != 'start') {
+            return;
+        }
+
         $tryTimes = 0;
         $output = new \Symfony\Component\Console\Output\ConsoleOutput();
         while ($tryTimes < $max) {
